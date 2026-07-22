@@ -768,7 +768,7 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1500
   m_LinearDamping: 0.1
-  m_AngularDamping: 0.05
+  m_AngularDamping: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -797,10 +797,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcdefa24c4db48a4faf38190801089a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarController
+  motorForce: 15000
+  brakeForce: 30000
+  reverseForce: 7000
   maxSpeed: 20
-  acceleration: 10
-  deceleration: 15
-  turnSpeed: 100
+  maxSteerAngle: 5
+  steeringSpeed: 1
+  speedSteerReduction: 0.6
+  tireGrip: 0.92
+  handbrakeGrip: 0.35
+  airDrag: 1.2
+  downforce: 500
 --- !u!4 &1275234926 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: df7495afdce80f54694ff3d2fae828ac, type: 3}
@@ -813,7 +820,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1275234922}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: c24d2983fa09bcb46bffa465b446e8d5, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
