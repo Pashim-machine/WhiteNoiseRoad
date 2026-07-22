@@ -1,9 +1,9 @@
-# RoadRacer — Игра с бесконечной процедурной генерацией дороги
+# WhiteNoiseRoad — Игра с бесконечной процедурной генерацией дороги
 
-[![Unity Build](https://img.shields.io/badge/Unity-2023.3.0f1-000000.svg?logo=unity)](https://unity.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Last Commit](https://badgen.net/github/last-commit/iamfifya/RoadRacer)](https://github.com/iamfifya/RoadRacer/commits/main)
-[![Code Size](https://img.shields.io/github/languages/code-size/iamfifya/RoadRacer)](https://github.com/iamfifya/RoadRacer)
+[![Unity Version](https://img.shields.io/badge/Unity-6.0-black.svg)](https://unity.com/)
+[![Language: C#](https://img.shields.io/badge/Language-C%23-blue.svg)](https://microsoft.com/en-us/visualstudio/languages/csharp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Platform: PC](https://img.shields.io/badge/Platform-PC-lightgrey.svg)]()
 
 ## 📝 Описание проекта
 
