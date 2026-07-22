@@ -801,13 +801,16 @@ MonoBehaviour:
   brakeForce: 30000
   reverseForce: 7000
   maxSpeed: 20
-  maxSteerAngle: 5
-  steeringSpeed: 1
+  maxSteerAngle: 35
+  steeringSpeed: 10
+  turnSensitivity: 0.5
   speedSteerReduction: 0.6
-  tireGrip: 0.92
-  handbrakeGrip: 0.35
+  tireGrip: 0.9
+  handbrakeGrip: 0.25
   airDrag: 1.2
   downforce: 500
+  gravityMultiplier: 3
+  centerOfMassOffset: {x: 0, y: -0.6, z: 0}
 --- !u!4 &1275234926 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: df7495afdce80f54694ff3d2fae828ac, type: 3}
