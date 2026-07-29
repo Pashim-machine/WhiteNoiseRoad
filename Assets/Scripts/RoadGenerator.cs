@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 public class RoadGenerator : MonoBehaviour
 {
-    [Header("Префабы дороги")]
-    public GameObject straightPrefab;
-    public GameObject leftPrefab;
-    public GameObject rightPrefab;
+    [Header("Префабы дороги (Массивы)")]
+    public GameObject[] straightPrefabs;
+    public GameObject[] leftPrefabs;
+    public GameObject[] rightPrefabs;
 
     [Header("Префабы окружения")]
-    public GameObject[] environmentPrefabs; // Сюда перетащи деревья, камни, кусты
-    [Range(0, 10)] public int objectsPerChunk = 5; // Сколько попыток спавна на один сегмент
-    public float roadWidth = 6f; // Ширина дороги (в этой зоне ничего не спавним)
-    public float envZoneWidth = 15f; // Как далеко от дороги могут расти объекты
-    public float chunkLength = 20f; // Примерная длина одного сегмента
+    public GameObject[] environmentPrefabs;
+    [Range(0, 10)] public int objectsPerChunk = 5;
+    public float roadWidth = 6f;
+    public float envZoneWidth = 15f;
+    public float chunkLength = 20f;
 
     [Header("Настройки")]
     public Transform player;
@@ -28,19 +28,22 @@ public class RoadGenerator : MonoBehaviour
 
     private List<GameObject> spawnedChunks = new List<GameObject>();
     private Transform lastEndPoint;
-    private List<Vector3> roadPositions = new List<Vector3>();
+
+    // Теперь храним позиции именно EndPoint'ов, это точнее для проверки пересечений
+    private List<Vector3> roadEndPositions = new List<Vector3>();
+
     private int consecutiveTurns = 0;
-    private int maxConsecutiveTurns = 3;
+    public int maxConsecutiveTurns = 2;
 
     void Start()
     {
-        if (!straightPrefab || !leftPrefab || !rightPrefab || !player)
+        if (straightPrefabs.Length == 0 || leftPrefabs.Length == 0 || rightPrefabs.Length == 0 || !player)
         {
-            Debug.LogError("❌ Не все ссылки назначены!");
+            Debug.LogError("❌ Не все массивы префабов дорог заполнены!");
             return;
         }
 
-        SpawnChunk(straightPrefab, true);
+        SpawnChunk(straightPrefabs[0], true);
         while (spawnedChunks.Count < maxChunksAhead)
         {
             SpawnNextChunk();
@@ -56,7 +59,7 @@ public class RoadGenerator : MonoBehaviour
 
         if (distanceToOldest > destroyDistance)
         {
-            roadPositions.RemoveAt(0);
+            roadEndPositions.RemoveAt(0);
             Destroy(oldestChunk);
             spawnedChunks.RemoveAt(0);
             SpawnNextChunk();
@@ -66,39 +69,51 @@ public class RoadGenerator : MonoBehaviour
     void SpawnNextChunk()
     {
         int randomVal = Random.Range(0, 100);
-        GameObject chosenPrefab;
+        GameObject[] chosenCategory;
 
-        if (randomVal < straightChance) chosenPrefab = straightPrefab;
-        else if (randomVal < straightChance + ((100 - straightChance) / 2)) chosenPrefab = leftPrefab;
-        else chosenPrefab = rightPrefab;
+        if (randomVal < straightChance) chosenCategory = straightPrefabs;
+        else if (randomVal < straightChance + ((100 - straightChance) / 2)) chosenCategory = leftPrefabs;
+        else chosenCategory = rightPrefabs;
 
-        if (chosenPrefab != straightPrefab && consecutiveTurns >= maxConsecutiveTurns)
-            chosenPrefab = straightPrefab;
+        if (chosenCategory != straightPrefabs && consecutiveTurns >= maxConsecutiveTurns)
+        {
+            chosenCategory = straightPrefabs;
+        }
+
+        GameObject chosenPrefab = chosenCategory[Random.Range(0, chosenCategory.Length)];
 
         if (!IsPositionSafe(chosenPrefab))
         {
-            if (chosenPrefab != straightPrefab) chosenPrefab = straightPrefab;
+            if (chosenCategory != straightPrefabs)
+            {
+                chosenCategory = straightPrefabs;
+                chosenPrefab = chosenCategory[Random.Range(0, chosenCategory.Length)];
+            }
         }
 
         SpawnChunk(chosenPrefab, false);
 
-        if (chosenPrefab != straightPrefab) consecutiveTurns++;
+        if (chosenCategory != straightPrefabs) consecutiveTurns++;
         else consecutiveTurns = 0;
     }
 
     bool IsPositionSafe(GameObject prefab)
     {
         if (lastEndPoint == null) return true;
-        Transform startPoint = prefab.transform.Find("StartPoint");
-        if (startPoint == null) return true;
+        Transform start = prefab.transform.Find("StartPoint");
+        Transform end = prefab.transform.Find("EndPoint");
 
-        Vector3 localOffset = startPoint.position - prefab.transform.position;
-        Vector3 rotatedOffset = lastEndPoint.rotation * localOffset;
-        Vector3 predictedPosition = lastEndPoint.position - rotatedOffset;
+        if (start == null || end == null) return true;
 
-        foreach (Vector3 pos in roadPositions)
+        // Предсказываем, где окажется конец новой дороги с учетом всех поворотов
+        Vector3 localEndPos = start.InverseTransformPoint(end.position);
+        Vector3 predictedEndPos = lastEndPoint.TransformPoint(localEndPos);
+
+        // Проверяем, не воткнется ли этот кусок в уже существующую дорогу
+        foreach (Vector3 pos in roadEndPositions)
         {
-            if (Vector3.Distance(predictedPosition, pos) < minDistanceBetweenRoads) return false;
+            if (Vector3.Distance(predictedEndPos, pos) < minDistanceBetweenRoads)
+                return false;
         }
         return true;
     }
@@ -109,6 +124,12 @@ public class RoadGenerator : MonoBehaviour
         Transform startPoint = newChunk.transform.Find("StartPoint");
         Transform endPoint = newChunk.transform.Find("EndPoint");
 
+        if (startPoint == null || endPoint == null)
+        {
+            Debug.LogError($"❌ Ошибка: В префабе {prefab.name} нет StartPoint или EndPoint!");
+            return;
+        }
+
         if (isFirstChunk || lastEndPoint == null)
         {
             newChunk.transform.position = Vector3.zero;
@@ -116,22 +137,20 @@ public class RoadGenerator : MonoBehaviour
         }
         else
         {
-            newChunk.transform.position = lastEndPoint.position;
-            newChunk.transform.rotation = lastEndPoint.rotation;
+            // --- ИДЕАЛЬНАЯ СТЫКОВКА ---
+            // 1. Выравниваем вращение (учитывая локальный поворот StartPoint внутри префаба)
+            Quaternion rotationOffset = lastEndPoint.rotation * Quaternion.Inverse(startPoint.rotation);
+            newChunk.transform.rotation = rotationOffset * newChunk.transform.rotation;
 
-            if (startPoint != null)
-            {
-                Vector3 offset = startPoint.position - newChunk.transform.position;
-                newChunk.transform.position -= offset;
-            }
+            // 2. Сдвигаем сам кусок так, чтобы StartPoint идеально встал в lastEndPoint
+            Vector3 positionOffset = lastEndPoint.position - startPoint.position;
+            newChunk.transform.position += positionOffset;
         }
 
-        // --- ГЕНЕРАЦИЯ ОКРУЖЕНИЯ ---
         PopulateEnvironment(newChunk);
-        // --------------------------
 
         spawnedChunks.Add(newChunk);
-        roadPositions.Add(newChunk.transform.position);
+        roadEndPositions.Add(endPoint.position);
         lastEndPoint = endPoint;
     }
 
@@ -141,35 +160,23 @@ public class RoadGenerator : MonoBehaviour
 
         for (int i = 0; i < objectsPerChunk; i++)
         {
-            // 1. Определяем сторону (лево или право)
             float side = Random.value > 0.5f ? 1f : -1f;
-
-            // 2. Выбираем случайную точку в локальных координатах чанка
-            // X: от границы дороги до края зоны окружения
             float randomX = Random.Range(roadWidth, envZoneWidth) * side;
-            // Z: случайная точка по длине сегмента
             float randomZ = Random.Range(-chunkLength / 2f, chunkLength / 2f);
-            // Y: оставляем 0, чтобы объект стоял на поверхности (или подстрой под свои модели)
-            float randomY = 0f;
 
-            Vector3 localPos = new Vector3(randomX, randomY, randomZ);
-
-            // 3. Выбираем случайный объект из библиотеки
+            Vector3 localPos = new Vector3(randomX, 0f, randomZ);
             GameObject envPrefab = environmentPrefabs[Random.Range(0, environmentPrefabs.Length)];
 
-            // 4. Спавним как дочерний объект чанка
             GameObject envObj = Instantiate(envPrefab, chunk.transform);
             envObj.transform.localPosition = localPos;
-
-            // Случайный поворот по оси Y для естественности
             envObj.transform.localRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
         }
     }
 
     void OnDrawGizmos()
     {
-        if (roadPositions == null) return;
+        if (roadEndPositions == null) return;
         Gizmos.color = Color.red;
-        foreach (Vector3 pos in roadPositions) Gizmos.DrawWireSphere(pos, minDistanceBetweenRoads / 2);
+        foreach (Vector3 pos in roadEndPositions) Gizmos.DrawWireSphere(pos, minDistanceBetweenRoads / 2);
     }
 }

@@ -1,7 +1,14 @@
 fileFormatVersion: 2
-guid: ef4a160129086d84f9dc409cc0155f16
+guid: a90ede86941fe5b4a9aa6451113e3879
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 212360
+  packageName: Simple Roads
+  packageVersion: 1.0.1
+  assetPath: Assets/Simple Roads/Prefabs/road (one lane) trun large.prefab
+  uploadId: 520970
