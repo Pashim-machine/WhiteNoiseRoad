@@ -70,14 +70,14 @@ Material:
     - _MaterialTypeMask: 2
     - _OpaqueCullMode: 2
     - _PerPixelSorting: 0
-    - _Rain_Amount: 1
+    - _Rain_Amount: 0
     - _RayTracing: 0
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
     - _RenderQueueType: 4
     - _RequireSplitLighting: 0
-    - _Speed: 0.0000032031603
+    - _Speed: 0.00000009742267
     - _SrcBlend: 1
     - _StencilRef: 0
     - _StencilRefDepth: 0

@@ -169,8 +169,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 12c1822b08290e94fad561bd4a0830d3, type: 2}
     - target: {fileID: -3809945072200597350, guid: 980d4e9904257f1438ad6c35251705ae, type: 3}
+      propertyPath: m_ReceiveGI
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3809945072200597350, guid: 980d4e9904257f1438ad6c35251705ae, type: 3}
+      propertyPath: m_CastShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3809945072200597350, guid: 980d4e9904257f1438ad6c35251705ae, type: 3}
       propertyPath: m_RayTracingMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3809945072200597350, guid: 980d4e9904257f1438ad6c35251705ae, type: 3}
+      propertyPath: m_ScaleInLightmap
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3809945072200597350, guid: 980d4e9904257f1438ad6c35251705ae, type: 3}
+      propertyPath: m_LightmapParameters
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: -3809945072200597350, guid: 980d4e9904257f1438ad6c35251705ae, type: 3}
       propertyPath: m_StaticShadowCaster

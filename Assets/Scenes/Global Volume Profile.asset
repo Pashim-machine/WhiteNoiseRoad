@@ -222,20 +222,20 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
   maximumSamples:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 256
   minimumDepth:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1
   maximumDepth:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 7
   maximumIntensity:
     m_OverrideState: 1
     m_Value: 10
   denoising:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
   useAOVs:
     m_OverrideState: 1
     m_Value: 1
@@ -244,7 +244,7 @@ MonoBehaviour:
     m_Value: 0
   separateVolumetrics:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   asyncDenoising:
     m_OverrideState: 0
     m_Value: 1
