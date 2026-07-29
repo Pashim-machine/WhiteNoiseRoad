@@ -30,11 +30,11 @@ Material:
   - DepthOnly
   - SHADOWCASTER
   - TransparentBackface
-  - TransparentDepthPrepass
+  - TransparentDepthPostpass
   - DecalProjectorForwardEmissive
   - RayTracingPrepass
   - DecalMeshForwardEmissive
-  - TransparentDepthPostpass
+  - TransparentDepthPrepass
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -263,7 +263,7 @@ Material:
     - _HeightTessAmplitude: 2
     - _HeightTessCenter: 0.5
     - _InvTilingScale: 1
-    - _Ior: 1.5
+    - _Ior: 1.316
     - _IridescenceMask: 1
     - _IridescenceThickness: 1
     - _LinkDetailsWithBase: 1

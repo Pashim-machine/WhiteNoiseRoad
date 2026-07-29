@@ -28,6 +28,9 @@ public class CarController : MonoBehaviour
     public float gravityMultiplier = 3f; // Во сколько раз машина падает быстрее обычного
     public Vector3 centerOfMassOffset = new Vector3(0f, -0.6f, 0f); // Смещение веса под днище
 
+    [Header("Дождь и Лобовое стекло")]
+    public Material windshieldMaterial; // Ссылка на материал стекла с эффектом дождя
+
     private Rigidbody rb;
     private float movementInput;
     private float rotationInput;
@@ -63,6 +66,13 @@ public class CarController : MonoBehaviour
         if (Keyboard.current[Key.S].isPressed) movementInput = -1f;
         if (Keyboard.current[Key.A].isPressed) rotationInput = -1f;
         if (Keyboard.current[Key.D].isPressed) rotationInput = 1f;
+
+        // Передаем локальную скорость машины в материал стекла для шейдера дождя
+        if (windshieldMaterial != null && rb != null)
+        {
+            float currentSpeed = transform.InverseTransformDirection(rb.linearVelocity).z; // Положительная при движении вперед, отрицательная назад
+            windshieldMaterial.SetFloat("_Speed", currentSpeed);
+        }
     }
 
     void FixedUpdate()
@@ -82,7 +92,6 @@ public class CarController : MonoBehaviour
         rb.AddForce(-transform.up * (downforce * currentSpeedAbs), ForceMode.Force);
 
         // МАГИЯ ТЯЖЕСТИ 3: Экстра-гравитация для устранения эффекта "перышка"
-        // (Physics.gravity уже тянет вниз на 1x, мы добавляем еще силы)
         rb.AddForce(Physics.gravity * rb.mass * (gravityMultiplier - 1f));
     }
 

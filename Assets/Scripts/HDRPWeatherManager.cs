@@ -30,6 +30,11 @@ public class HDRPWeatherManager : MonoBehaviour
     public VolumeProfile clearProfile;      // Профиль ясной погоды
     public VolumeProfile rainProfile;       // Профиль дождливой погоды
 
+    [Header("Материал лобового стекла (Капли)")]
+    public Material windshieldMaterial;     // Сюда кидаем материал стекла
+    public float rainFadeSpeed = 0.5f;      // Скорость появления/исчезновения капель
+    private float currentWindshieldRain = 0f; // Текущее значение капель на стекле
+
     [Header("Интенсивность солнца (в Люксах)")]
     public float clearSunLux = 100000f;     // Яркое солнце днем
     public float rainSunLux = 15000f;       // Приглушенное солнце при тучах
@@ -43,12 +48,17 @@ public class HDRPWeatherManager : MonoBehaviour
     {
         // Инициализация при старте
         SetRain(false);
+        if (windshieldMaterial != null)
+        {
+            windshieldMaterial.SetFloat("_Rain_Amount", 0f); // При старте стекло сухое
+        }
     }
 
     void Update()
     {
         UpdateTimeOfDay();
         UpdateWeatherSystem();
+        UpdateWindshieldRain();
     }
 
     void UpdateTimeOfDay()
@@ -64,7 +74,6 @@ public class HDRPWeatherManager : MonoBehaviour
         }
 
         // Плавное вращение солнца на основе текущего часа (от 0 до 24)
-        // 0 часов (ночь) = -90°, 6 часов (утро) = 0°, 12 часов (день) = 90°, 18 часов (вечер) = 180°
         float sunAngle = (currentTimeOfDay / 24f) * 360f - 90f;
         if (sunLight != null)
         {
@@ -93,6 +102,20 @@ public class HDRPWeatherManager : MonoBehaviour
                 SetRain(false);
             }
         }
+    }
+
+    void UpdateWindshieldRain()
+    {
+        if (windshieldMaterial == null) return;
+
+        // Определяем, к какому значению мы стремимся: 1 (ливень) или 0 (сухо)
+        float targetRainAmount = isRaining ? 1f : 0f;
+
+        // Плавно меняем текущее значение
+        currentWindshieldRain = Mathf.MoveTowards(currentWindshieldRain, targetRainAmount, rainFadeSpeed * Time.deltaTime);
+
+        // Передаем в шейдер
+        windshieldMaterial.SetFloat("_Rain_Amount", currentWindshieldRain);
     }
 
     void CheckWeatherProbability()
