@@ -1,0 +1,40 @@
+fileFormatVersion: 2
+guid: a47596397196fb441bb70b2f6cd51d2b
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 715df9372183c47e389bb6e19fbc3b52, type: 3}
+  editorImportSettings:
+    generateSecondaryUVSet: 1
+  importSettings:
+    nodeNameMethod: 1
+    animationMethod: 2
+    generateMipMaps: 1
+    texturesReadable: 1
+    defaultMinFilterMode: 9729
+    defaultMagFilterMode: 9729
+    anisotropicFilterLevel: 1
+  instantiationSettings:
+    mask: -1
+    layer: 0
+    skinUpdateWhenOffscreen: 1
+    lightIntensityFactor: 1
+    sceneObjectCreation: 2
+  assetDependencies:
+  - type: 0
+    originalUri: Assets\DownloadedAssets\an_animated_cat\scene.bin
+    assetPath: Assets\DownloadedAssets\an_animated_cat\scene.bin
+  - type: 1
+    originalUri: Assets\DownloadedAssets\an_animated_cat\textures\Material_81_baseColor.png
+    assetPath: Assets\DownloadedAssets\an_animated_cat\textures\Material_81_baseColor.png
+  - type: 1
+    originalUri: Assets\DownloadedAssets\an_animated_cat\textures\Material_105_baseColor.png
+    assetPath: Assets\DownloadedAssets\an_animated_cat\textures\Material_105_baseColor.png
+  - type: 1
+    originalUri: Assets\DownloadedAssets\an_animated_cat\textures\Material_93_baseColor.png
+    assetPath: Assets\DownloadedAssets\an_animated_cat\textures\Material_93_baseColor.png
+  reportItems: []
