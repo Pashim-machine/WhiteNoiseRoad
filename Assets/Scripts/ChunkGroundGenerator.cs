@@ -1,25 +1,89 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class ChunkGroundGenerator : MonoBehaviour
 {
     [Header("Настройки ландшафта")]
-    public float width = 40f;      // Общая ширина чанка (дорога + обочины)
-    public float length = 50f;     // Длина чанка
-    public int resolution = 10;    // Детализация сетки
-    public float heightScale = 3f; // Высота холмов по бокам
-    public float roadWidth = 8f;   // Ширина зоны дороги (там будет плоско)
+    public float width = 500f;
+    public float length = 500f;
+    public int resolution = 50;
+    public float heightScale = 20f;
+    public float noiseScale = 0.02f;
+
+    [Header("Настройки обочины")]
+    [Tooltip("Базовая ширина плоской обочины от края моделей")]
+    public float roadCheckRadius = 6f;
+    [Tooltip("Длина плавного подъема холма")]
+    public float blendZone = 15f;
+
+    [System.Serializable]
+    public struct SceneryObject
+    {
+        public GameObject prefab;
+        [Range(0.1f, 10f)] public float spawnWeight;
+    }
+
+    [Header("Декорации (Рандомный спавн)")]
+    public List<SceneryObject> sceneryPrefabs;
+    public int objectsCount = 40;
+
+    private List<Renderer> obstacleRenderers = new List<Renderer>();
+    private float actualFlatZone;
 
     void Start()
     {
+        obstacleRenderers.Clear();
+
+        // БОЛЬШЕ НИКАКИХ ТЕГОВ! Берем ВООБЩЕ ВСЕ визуальные модели внутри чанка
+        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
+
+        foreach (Renderer rend in allRenderers)
+        {
+            // Добавляем в препятствия всё, кроме самой генерируемой земли,
+            // чтобы земля не сплющила саму себя
+            if (rend.gameObject != this.gameObject)
+            {
+                obstacleRenderers.Add(rend);
+            }
+        }
+
+        if (obstacleRenderers.Count == 0)
+        {
+            Debug.LogWarning($"[Ландшафт] В чанке {gameObject.name} вообще нет объектов! Земле не под что подстраиваться.");
+        }
+
+        // Защита от наложения полигонов
+        float stepX = width / resolution;
+        float stepZ = length / resolution;
+        float maxGridStep = Mathf.Max(stepX, stepZ);
+        actualFlatZone = Mathf.Max(roadCheckRadius, maxGridStep * 1.5f);
+
         GenerateTerrainMesh();
+        SpawnScenery();
+    }
+
+    float GetDistanceToObstacle(Vector3 worldPoint)
+    {
+        if (obstacleRenderers.Count == 0) return 0f;
+
+        float minDistance = float.MaxValue;
+        foreach (var rend in obstacleRenderers)
+        {
+            // Измеряем дистанцию до границ (Bounds) любой модели в чанке
+            float dist = Mathf.Sqrt(rend.bounds.SqrDistance(worldPoint));
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+            }
+        }
+        return minDistance;
     }
 
     void GenerateTerrainMesh()
     {
         MeshFilter meshFilter = GetComponent<MeshFilter>();
-        Mesh mesh = new Mesh();
-        mesh.name = "ProceduralGround";
+        Mesh mesh = new Mesh { name = "ProceduralGround" };
 
         int vertCountX = resolution + 1;
         int vertCountZ = resolution + 1;
@@ -30,7 +94,6 @@ public class ChunkGroundGenerator : MonoBehaviour
         float stepX = width / resolution;
         float stepZ = length / resolution;
 
-        // 1. Генерируем вершины
         int vertexIndex = 0;
         for (int z = 0; z < vertCountZ; z++)
         {
@@ -39,15 +102,18 @@ public class ChunkGroundGenerator : MonoBehaviour
                 float xPos = (x * stepX) - (width / 2f);
                 float zPos = z * stepZ;
 
+                Vector3 worldPos = transform.TransformPoint(new Vector3(xPos, 0, zPos));
+
+                // Проверяем дистанцию до ЛЮБОЙ модели
+                float distToObstacle = GetDistanceToObstacle(worldPos);
                 float yPos = 0f;
 
-                // Делаем дорогу по центру плоской, а по бокам поднимаем холмы с помощью Mathf.PerlinNoise
-                float distanceFromCenter = Mathf.Abs(xPos);
-                if (distanceFromCenter > (roadWidth / 2f))
+                if (distToObstacle > actualFlatZone)
                 {
-                    // Шум Перлина для создания реалистичных холмов и отаек
-                    float noiseFactor = (distanceFromCenter - (roadWidth / 2f)) / (width / 2f);
-                    yPos = Mathf.PerlinNoise(xPos * 0.05f + transform.position.x, zPos * 0.05f + transform.position.z) * heightScale * noiseFactor;
+                    float fadeFactor = Mathf.InverseLerp(actualFlatZone, actualFlatZone + blendZone, distToObstacle);
+                    fadeFactor = Mathf.SmoothStep(0f, 1f, fadeFactor);
+
+                    yPos = Mathf.PerlinNoise(worldPos.x * noiseScale, worldPos.z * noiseScale) * heightScale * fadeFactor;
                 }
 
                 vertices[vertexIndex] = new Vector3(xPos, yPos, zPos);
@@ -56,7 +122,6 @@ public class ChunkGroundGenerator : MonoBehaviour
             }
         }
 
-        // 2. Генерируем треугольники
         int tris = 0;
         for (int z = 0; z < resolution; z++)
         {
@@ -67,12 +132,9 @@ public class ChunkGroundGenerator : MonoBehaviour
                 int i2 = (z + 1) * vertCountX + (x + 1);
                 int i3 = z * vertCountX + (x + 1);
 
-                // Первый треугольник квадрата
                 triangles[tris + 0] = i0;
                 triangles[tris + 1] = i1;
                 triangles[tris + 2] = i2;
-
-                // Второй треугольник квадрата
                 triangles[tris + 3] = i0;
                 triangles[tris + 4] = i2;
                 triangles[tris + 5] = i3;
@@ -85,15 +147,65 @@ public class ChunkGroundGenerator : MonoBehaviour
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
-
         meshFilter.mesh = mesh;
 
-        // Автоматически добавляем коллайдер, чтобы машина не проваливалась сквозь землю
         MeshCollider collider = GetComponent<MeshCollider>();
-        if (collider == null)
-        {
-            collider = gameObject.AddComponent<MeshCollider>();
-        }
+        if (collider == null) collider = gameObject.AddComponent<MeshCollider>();
         collider.sharedMesh = mesh;
+    }
+
+    void SpawnScenery()
+    {
+        if (sceneryPrefabs == null || sceneryPrefabs.Count == 0) return;
+
+        GameObject sceneryParent = new GameObject("SceneryContainer");
+        sceneryParent.transform.SetParent(transform);
+        sceneryParent.transform.localPosition = Vector3.zero;
+
+        int spawned = 0;
+        int attempts = 0;
+
+        while (spawned < objectsCount && attempts < objectsCount * 4)
+        {
+            attempts++;
+
+            float localX = Random.Range(-width / 2f, width / 2f);
+            float localZ = Random.Range(2f, length - 2f);
+            Vector3 worldPos = transform.TransformPoint(new Vector3(localX, 0, localZ));
+
+            float dist = GetDistanceToObstacle(worldPos);
+
+            if (dist < actualFlatZone + 2f) continue;
+
+            float fadeFactor = Mathf.InverseLerp(actualFlatZone, actualFlatZone + blendZone, dist);
+            fadeFactor = Mathf.SmoothStep(0f, 1f, fadeFactor);
+            float yPos = Mathf.PerlinNoise(worldPos.x * noiseScale, worldPos.z * noiseScale) * heightScale * fadeFactor;
+
+            GameObject selectedPrefab = GetRandomPrefab();
+            if (selectedPrefab != null)
+            {
+                GameObject obj = Instantiate(selectedPrefab, sceneryParent.transform);
+                obj.transform.localPosition = new Vector3(localX, yPos, localZ);
+                obj.transform.localRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+                obj.transform.localScale = Vector3.one * Random.Range(0.8f, 1.4f);
+                spawned++;
+            }
+        }
+    }
+
+    GameObject GetRandomPrefab()
+    {
+        float totalWeight = 0f;
+        foreach (var item in sceneryPrefabs) totalWeight += item.spawnWeight;
+
+        float randomValue = Random.Range(0f, totalWeight);
+        float currentWeight = 0f;
+
+        foreach (var item in sceneryPrefabs)
+        {
+            currentWeight += item.spawnWeight;
+            if (randomValue <= currentWeight) return item.prefab;
+        }
+        return sceneryPrefabs[0].prefab;
     }
 }
