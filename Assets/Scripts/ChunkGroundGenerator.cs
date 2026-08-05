@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.VFX;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class ChunkGroundGenerator : MonoBehaviour
@@ -89,7 +90,12 @@ public class ChunkGroundGenerator : MonoBehaviour
         int vertCountZ = resolution + 1;
         Vector3[] vertices = new Vector3[vertCountX * vertCountZ];
         Vector2[] uv = new Vector2[vertices.Length];
+
+        // Список треугольников для основного меша (земля + дорога для коллайдера)
         int[] triangles = new int[resolution * resolution * 6];
+
+        // Список треугольников ТОЛЬКО для травы (дорога исключена)
+        List<int> grassTriangles = new List<int>();
 
         float stepX = width / resolution;
         float stepZ = length / resolution;
@@ -104,7 +110,6 @@ public class ChunkGroundGenerator : MonoBehaviour
 
                 Vector3 worldPos = transform.TransformPoint(new Vector3(xPos, 0, zPos));
 
-                // Проверяем дистанцию до ЛЮБОЙ модели
                 float distToObstacle = GetDistanceToObstacle(worldPos);
                 float yPos = 0f;
 
@@ -132,17 +137,34 @@ public class ChunkGroundGenerator : MonoBehaviour
                 int i2 = (z + 1) * vertCountX + (x + 1);
                 int i3 = z * vertCountX + (x + 1);
 
+                // Добавляем треугольники в основной меш
                 triangles[tris + 0] = i0;
                 triangles[tris + 1] = i1;
                 triangles[tris + 2] = i2;
                 triangles[tris + 3] = i0;
                 triangles[tris + 4] = i2;
                 triangles[tris + 5] = i3;
-
                 tris += 6;
+
+                // Проверяем центр квадрата: если это не дорога/обочина, добавляем треугольники для травы
+                Vector3 centerLocal = (vertices[i0] + vertices[i1] + vertices[i2] + vertices[i3]) / 4f;
+                Vector3 centerWorld = transform.TransformPoint(centerLocal);
+                float distToCenter = GetDistanceToObstacle(centerWorld);
+
+                // Отступаем чуть дальше зоны обочины, чтобы трава не лезла на асфальт
+                if (distToCenter > actualFlatZone + 1.5f)
+                {
+                    grassTriangles.Add(i0);
+                    grassTriangles.Add(i1);
+                    grassTriangles.Add(i2);
+                    grassTriangles.Add(i0);
+                    grassTriangles.Add(i2);
+                    grassTriangles.Add(i3);
+                }
             }
         }
 
+        // 1. Собираем основной меш для земли и коллайдера
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
@@ -152,6 +174,21 @@ public class ChunkGroundGenerator : MonoBehaviour
         MeshCollider collider = GetComponent<MeshCollider>();
         if (collider == null) collider = gameObject.AddComponent<MeshCollider>();
         collider.sharedMesh = mesh;
+
+        // 2. Создаем отдельный облегченный меш специально для травы (без дороги)
+        Mesh grassMesh = new Mesh { name = "GrassOnlyMesh" };
+        grassMesh.vertices = vertices;
+        grassMesh.uv = uv;
+        grassMesh.triangles = grassTriangles.ToArray();
+        grassMesh.RecalculateNormals();
+
+        // 3. Передаем чистый меш в VFX Graph
+        VisualEffect vfx = GetComponent<VisualEffect>();
+        if (vfx != null)
+        {
+            vfx.SetMesh("GroundMesh", grassMesh);
+            vfx.Play();
+        }
     }
 
     void SpawnScenery()
@@ -208,4 +245,6 @@ public class ChunkGroundGenerator : MonoBehaviour
         }
         return sceneryPrefabs[0].prefab;
     }
+
+
 }
