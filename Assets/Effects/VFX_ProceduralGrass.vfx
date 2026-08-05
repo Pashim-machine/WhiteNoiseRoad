@@ -19,7 +19,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 424
     y: 481
-    width: 1228
+    width: 1216
     height: 1733
 --- !u!114 &114350483966674976
 MonoBehaviour:
@@ -272,7 +272,7 @@ MonoBehaviour:
   onlyAmbientLighting: 0
   diffusionProfileAsset: {fileID: 0}
   multiplyThicknessWithAlpha: 0
-  doubleSided: 0
+  doubleSided: 1
   preserveSpecularLighting: 0
   enableSpecular: 1
   lightmapRemapMode: 0
@@ -2536,7 +2536,7 @@ MonoBehaviour:
   onlyAmbientLighting: 0
   diffusionProfileAsset: {fileID: 0}
   multiplyThicknessWithAlpha: 0
-  doubleSided: 0
+  doubleSided: 1
   preserveSpecularLighting: 0
   enableSpecular: 1
   lightmapRemapMode: 0
@@ -2721,7 +2721,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 1228.2355, y: 1799.5614}
+  m_UIPosition: {x: 1216, y: 1487}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -2783,7 +2783,7 @@ MonoBehaviour:
   onlyAmbientLighting: 0
   diffusionProfileAsset: {fileID: 0}
   multiplyThicknessWithAlpha: 0
-  doubleSided: 0
+  doubleSided: 1
   preserveSpecularLighting: 0
   enableSpecular: 1
   lightmapRemapMode: 0
