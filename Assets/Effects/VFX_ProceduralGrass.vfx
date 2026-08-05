@@ -19,7 +19,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 424
     y: 481
-    width: 1642
+    width: 1228
     height: 1733
 --- !u!114 &114350483966674976
 MonoBehaviour:
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Parent: {fileID: 114350483966674976}
   m_Children:
   - {fileID: 8926484042661614580}
-  m_UIPosition: {x: 680, y: 1303}
+  m_UIPosition: {x: 682, y: 1433}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots: []
@@ -2643,7 +2643,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"d238efbd27bc5ae4ead9839995f74830","type":3}}'
+      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"91a1945982e98be4d9fe3e3d12fdebd8","type":3}}'
     m_Space: -1
   m_Property:
     name: baseColorMap
@@ -2721,7 +2721,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 1237, y: 1458}
+  m_UIPosition: {x: 1228.2355, y: 1799.5614}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -2890,7 +2890,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Texture2D, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"cf3069941001b5c46b1f13d4551d0fd9","type":3}}'
+      m_SerializableObject: '{"obj":{"fileID":2800000,"guid":"91a1945982e98be4d9fe3e3d12fdebd8","type":3}}'
     m_Space: -1
   m_Property:
     name: baseColorMap
