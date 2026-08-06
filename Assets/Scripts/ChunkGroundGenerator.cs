@@ -1,250 +1,366 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.VFX;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class ChunkGroundGenerator : MonoBehaviour
 {
-    [Header("Настройки ландшафта")]
+    [Header("Ландшафт")]
     public float width = 500f;
     public float length = 500f;
     public int resolution = 50;
     public float heightScale = 20f;
     public float noiseScale = 0.02f;
 
-    [Header("Настройки обочины")]
-    [Tooltip("Базовая ширина плоской обочины от края моделей")]
-    public float roadCheckRadius = 6f;
-    [Tooltip("Длина плавного подъема холма")]
+    [Header("Препятствия (дороги, объекты)")]
+    [Tooltip("Расстояние от границ объектов, на котором рельеф остаётся плоским")]
+    public float flatZoneRadius = 8f;
+    [Tooltip("Зона перехода к холмам")]
     public float blendZone = 15f;
 
-    [System.Serializable]
-    public struct SceneryObject
-    {
-        public GameObject prefab;
-        [Range(0.1f, 10f)] public float spawnWeight;
-    }
+    [Header("Трава (GPU Instancing)")]
+    public Mesh grassQuadMesh;
+    public Material grassMaterial;
+    public float grassStep = 3f;
+    public float grassMinScale = 0.6f;
+    public float grassMaxScale = 1.4f;
+    public int maxGrassPoints = 30000;
 
-    [Header("Декорации (Рандомный спавн)")]
-    public List<SceneryObject> sceneryPrefabs;
-    public int objectsCount = 40;
-
-    private List<Renderer> obstacleRenderers = new List<Renderer>();
-    private float actualFlatZone;
+    private DistanceField distanceField;
+    private List<Vector3> grassPositions = new List<Vector3>();
+    private List<Vector3> grassNormals = new List<Vector3>();
+    private Matrix4x4[][] grassBatches;
+    private bool grassReady = false;
 
     void Start()
     {
-        obstacleRenderers.Clear();
+        List<Renderer> obstacles = new List<Renderer>();
 
-        // БОЛЬШЕ НИКАКИХ ТЕГОВ! Берем ВООБЩЕ ВСЕ визуальные модели внутри чанка
-        Renderer[] allRenderers = GetComponentsInChildren<Renderer>();
-
-        foreach (Renderer rend in allRenderers)
+        // Защита: игнорируем препятствия, которые больше половины размера чанка (чтобы не заблокировать весь чанк)
+        float maxObstacleSize = Mathf.Max(width, length) * 0.5f;
+        foreach (var r in GetComponentsInChildren<Renderer>())
         {
-            // Добавляем в препятствия всё, кроме самой генерируемой земли,
-            // чтобы земля не сплющила саму себя
-            if (rend.gameObject != this.gameObject)
-            {
-                obstacleRenderers.Add(rend);
-            }
+            if (r.gameObject != gameObject && r.bounds.size.magnitude < maxObstacleSize)
+                obstacles.Add(r);
         }
 
-        if (obstacleRenderers.Count == 0)
+        if (grassQuadMesh == null)
         {
-            Debug.LogWarning($"[Ландшафт] В чанке {gameObject.name} вообще нет объектов! Земле не под что подстраиваться.");
+            grassQuadMesh = CreateGrassQuadMesh();
         }
 
-        // Защита от наложения полигонов
-        float stepX = width / resolution;
-        float stepZ = length / resolution;
-        float maxGridStep = Mathf.Max(stepX, stepZ);
-        actualFlatZone = Mathf.Max(roadCheckRadius, maxGridStep * 1.5f);
+        distanceField = new DistanceField(obstacles, width, length, 64, transform);
 
         GenerateTerrainMesh();
-        SpawnScenery();
-    }
+        GenerateGrassPoints();
+        grassReady = true;
 
-    float GetDistanceToObstacle(Vector3 worldPoint)
-    {
-        if (obstacleRenderers.Count == 0) return 0f;
-
-        float minDistance = float.MaxValue;
-        foreach (var rend in obstacleRenderers)
+        // Проверка и включение Instancing
+        if (grassMaterial != null)
         {
-            // Измеряем дистанцию до границ (Bounds) любой модели в чанке
-            float dist = Mathf.Sqrt(rend.bounds.SqrDistance(worldPoint));
-            if (dist < minDistance)
+            grassMaterial.enableInstancing = true;
+            if (!grassMaterial.enableInstancing)
             {
-                minDistance = dist;
+                Debug.LogError($"Материал {grassMaterial.name} НЕ поддерживает GPU Instancing! Трава не будет отображаться. Включите галочку 'Enable GPU Instancing' в материале.");
             }
         }
-        return minDistance;
+        else
+        {
+            Debug.LogError("Материал травы не назначен!");
+        }
+    }
+
+    void Update()
+    {
+        if (grassReady && grassBatches != null && grassMaterial != null && grassMaterial.enableInstancing)
+        {
+            foreach (var batch in grassBatches)
+            {
+                if (batch.Length > 0)
+                {
+                    // Используем полную сигнатуру с гигантскими Bounds, чтобы Unity не отсекала траву
+                    Graphics.DrawMeshInstanced(grassQuadMesh, 0, grassMaterial, batch, batch.Length, null, UnityEngine.Rendering.ShadowCastingMode.Off, false);
+                }
+            }
+        }
+    }
+
+    Mesh CreateGrassQuadMesh()
+    {
+        Mesh mesh = new Mesh { name = "GrassQuad" };
+
+        Vector3[] vertices = new Vector3[8];
+        Vector2[] uv = new Vector2[8];
+        int[] triangles = new int[12];
+
+        float hw = 0.5f;
+        float h = 1.0f;
+
+        vertices[0] = new Vector3(-hw, 0, 0);
+        vertices[1] = new Vector3(hw, 0, 0);
+        vertices[2] = new Vector3(-hw, h, 0);
+        vertices[3] = new Vector3(hw, h, 0);
+
+        vertices[4] = new Vector3(0, 0, -hw);
+        vertices[5] = new Vector3(0, 0, hw);
+        vertices[6] = new Vector3(0, h, -hw);
+        vertices[7] = new Vector3(0, h, hw);
+
+        uv[0] = new Vector2(0, 0); uv[1] = new Vector2(1, 0); uv[2] = new Vector2(0, 1); uv[3] = new Vector2(1, 1);
+        uv[4] = new Vector2(0, 0); uv[5] = new Vector2(1, 0); uv[6] = new Vector2(0, 1); uv[7] = new Vector2(1, 1);
+
+        triangles[0] = 0; triangles[1] = 1; triangles[2] = 2;
+        triangles[3] = 2; triangles[4] = 1; triangles[5] = 3;
+
+        triangles[6] = 4; triangles[7] = 5; triangles[8] = 6;
+        triangles[9] = 6; triangles[10] = 5; triangles[11] = 7;
+
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+
+        // КРИТИЧЕСКИ ВАЖНО: Задаем гигантские Bounds, чтобы внутренний куллинг Unity не удалял пачки травы
+        mesh.bounds = new Bounds(Vector3.zero, new Vector3(10000f, 10000f, 10000f));
+        return mesh;
     }
 
     void GenerateTerrainMesh()
     {
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
         Mesh mesh = new Mesh { name = "ProceduralGround" };
-
         int vertCountX = resolution + 1;
         int vertCountZ = resolution + 1;
-        Vector3[] vertices = new Vector3[vertCountX * vertCountZ];
-        Vector2[] uv = new Vector2[vertices.Length];
-
-        // Список треугольников для основного меша (земля + дорога для коллайдера)
+        int totalVerts = vertCountX * vertCountZ;
+        Vector3[] vertices = new Vector3[totalVerts];
+        Vector2[] uv = new Vector2[totalVerts];
         int[] triangles = new int[resolution * resolution * 6];
-
-        // Список треугольников ТОЛЬКО для травы (дорога исключена)
-        List<int> grassTriangles = new List<int>();
 
         float stepX = width / resolution;
         float stepZ = length / resolution;
 
-        int vertexIndex = 0;
-        for (int z = 0; z < vertCountZ; z++)
+        for (int z = 0, i = 0; z < vertCountZ; z++)
         {
-            for (int x = 0; x < vertCountX; x++)
+            for (int x = 0; x < vertCountX; x++, i++)
             {
-                float xPos = (x * stepX) - (width / 2f);
-                float zPos = z * stepZ;
+                float localX = (x * stepX) - (width * 0.5f);
+                float localZ = z * stepZ;
+                Vector3 worldPos = transform.TransformPoint(new Vector3(localX, 0, localZ));
+                float dist = distanceField.SampleDistance(worldPos);
 
-                Vector3 worldPos = transform.TransformPoint(new Vector3(xPos, 0, zPos));
-
-                float distToObstacle = GetDistanceToObstacle(worldPos);
-                float yPos = 0f;
-
-                if (distToObstacle > actualFlatZone)
+                float y = 0f;
+                if (dist > flatZoneRadius)
                 {
-                    float fadeFactor = Mathf.InverseLerp(actualFlatZone, actualFlatZone + blendZone, distToObstacle);
-                    fadeFactor = Mathf.SmoothStep(0f, 1f, fadeFactor);
-
-                    yPos = Mathf.PerlinNoise(worldPos.x * noiseScale, worldPos.z * noiseScale) * heightScale * fadeFactor;
+                    float fade = Mathf.InverseLerp(flatZoneRadius, flatZoneRadius + blendZone, dist);
+                    fade = Mathf.SmoothStep(0f, 1f, fade);
+                    y = Mathf.PerlinNoise(localX * noiseScale, localZ * noiseScale) * heightScale * fade;
                 }
 
-                vertices[vertexIndex] = new Vector3(xPos, yPos, zPos);
-                uv[vertexIndex] = new Vector2((float)x / resolution, (float)z / resolution);
-                vertexIndex++;
+                vertices[i] = new Vector3(localX, y, localZ);
+                uv[i] = new Vector2((float)x / resolution, (float)z / resolution);
             }
         }
 
-        int tris = 0;
+        int triIndex = 0;
         for (int z = 0; z < resolution; z++)
         {
             for (int x = 0; x < resolution; x++)
             {
                 int i0 = z * vertCountX + x;
-                int i1 = (z + 1) * vertCountX + x;
-                int i2 = (z + 1) * vertCountX + (x + 1);
-                int i3 = z * vertCountX + (x + 1);
+                int i1 = i0 + vertCountX;
+                int i2 = i1 + 1;
+                int i3 = i0 + 1;
 
-                // Добавляем треугольники в основной меш
-                triangles[tris + 0] = i0;
-                triangles[tris + 1] = i1;
-                triangles[tris + 2] = i2;
-                triangles[tris + 3] = i0;
-                triangles[tris + 4] = i2;
-                triangles[tris + 5] = i3;
-                tris += 6;
-
-                // Проверяем центр квадрата: если это не дорога/обочина, добавляем треугольники для травы
-                Vector3 centerLocal = (vertices[i0] + vertices[i1] + vertices[i2] + vertices[i3]) / 4f;
-                Vector3 centerWorld = transform.TransformPoint(centerLocal);
-                float distToCenter = GetDistanceToObstacle(centerWorld);
-
-                // Отступаем чуть дальше зоны обочины, чтобы трава не лезла на асфальт
-                if (distToCenter > actualFlatZone + 1.5f)
-                {
-                    grassTriangles.Add(i0);
-                    grassTriangles.Add(i1);
-                    grassTriangles.Add(i2);
-                    grassTriangles.Add(i0);
-                    grassTriangles.Add(i2);
-                    grassTriangles.Add(i3);
-                }
+                triangles[triIndex++] = i0;
+                triangles[triIndex++] = i1;
+                triangles[triIndex++] = i2;
+                triangles[triIndex++] = i0;
+                triangles[triIndex++] = i2;
+                triangles[triIndex++] = i3;
             }
         }
 
-        // 1. Собираем основной меш для земли и коллайдера
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
-        meshFilter.mesh = mesh;
+        GetComponent<MeshFilter>().mesh = mesh;
 
-        MeshCollider collider = GetComponent<MeshCollider>();
-        if (collider == null) collider = gameObject.AddComponent<MeshCollider>();
-        collider.sharedMesh = mesh;
-
-        // 2. Создаем отдельный облегченный меш специально для травы (без дороги)
-        Mesh grassMesh = new Mesh { name = "GrassOnlyMesh" };
-        grassMesh.vertices = vertices;
-        grassMesh.uv = uv;
-        grassMesh.triangles = grassTriangles.ToArray();
-        grassMesh.RecalculateNormals();
-
-        // 3. Передаем чистый меш в VFX Graph
-        VisualEffect vfx = GetComponent<VisualEffect>();
-        if (vfx != null)
-        {
-            vfx.SetMesh("GroundMesh", grassMesh);
-            vfx.Play();
-        }
+        var col = GetComponent<MeshCollider>();
+        if (!col) col = gameObject.AddComponent<MeshCollider>();
+        col.sharedMesh = mesh;
     }
 
-    void SpawnScenery()
+    void GenerateGrassPoints()
     {
-        if (sceneryPrefabs == null || sceneryPrefabs.Count == 0) return;
+        grassPositions.Clear();
+        grassNormals.Clear();
+        float halfW = width * 0.5f;
 
-        GameObject sceneryParent = new GameObject("SceneryContainer");
-        sceneryParent.transform.SetParent(transform);
-        sceneryParent.transform.localPosition = Vector3.zero;
+        float cellSize = grassStep;
+        int cellsX = Mathf.FloorToInt(width / cellSize);
+        int cellsZ = Mathf.FloorToInt(length / cellSize);
 
-        int spawned = 0;
-        int attempts = 0;
+        MeshCollider chunkCollider = GetComponent<MeshCollider>();
 
-        while (spawned < objectsCount && attempts < objectsCount * 4)
+        for (int cx = 0; cx < cellsX; cx++)
         {
-            attempts++;
-
-            float localX = Random.Range(-width / 2f, width / 2f);
-            float localZ = Random.Range(2f, length - 2f);
-            Vector3 worldPos = transform.TransformPoint(new Vector3(localX, 0, localZ));
-
-            float dist = GetDistanceToObstacle(worldPos);
-
-            if (dist < actualFlatZone + 2f) continue;
-
-            float fadeFactor = Mathf.InverseLerp(actualFlatZone, actualFlatZone + blendZone, dist);
-            fadeFactor = Mathf.SmoothStep(0f, 1f, fadeFactor);
-            float yPos = Mathf.PerlinNoise(worldPos.x * noiseScale, worldPos.z * noiseScale) * heightScale * fadeFactor;
-
-            GameObject selectedPrefab = GetRandomPrefab();
-            if (selectedPrefab != null)
+            for (int cz = 0; cz < cellsZ; cz++)
             {
-                GameObject obj = Instantiate(selectedPrefab, sceneryParent.transform);
-                obj.transform.localPosition = new Vector3(localX, yPos, localZ);
-                obj.transform.localRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-                obj.transform.localScale = Vector3.one * Random.Range(0.8f, 1.4f);
-                spawned++;
+                if (grassPositions.Count >= maxGrassPoints)
+                    break;
+
+                float jitterX = Random.value;
+                float jitterZ = Random.value;
+
+                float x = (cx + jitterX) * cellSize - halfW;
+                float z = (cz + jitterZ) * cellSize;
+
+                Vector3 localPos = new Vector3(x, 0, z);
+                Vector3 worldPos = transform.TransformPoint(localPos);
+                float dist = distanceField.SampleDistance(worldPos);
+
+                if (dist < flatZoneRadius + 1.0f)
+                    continue;
+
+                Vector3 finalWorldPos = worldPos;
+                Vector3 finalNormal = Vector3.up;
+                bool hitFound = false;
+
+                if (chunkCollider != null && chunkCollider.sharedMesh != null)
+                {
+                    Vector3 rayStart = worldPos + Vector3.up * (heightScale * 2f + 100f);
+                    Ray ray = new Ray(rayStart, Vector3.down);
+                    if (chunkCollider.Raycast(ray, out RaycastHit hit, heightScale * 5f + 200f))
+                    {
+                        finalWorldPos = hit.point;
+                        finalNormal = hit.normal;
+                        if (finalNormal.sqrMagnitude < 0.1f) finalNormal = Vector3.up;
+                        finalNormal.Normalize();
+                        hitFound = true;
+                    }
+                }
+
+                if (!hitFound)
+                {
+                    float fade = Mathf.InverseLerp(flatZoneRadius, flatZoneRadius + blendZone, dist);
+                    fade = Mathf.SmoothStep(0f, 1f, fade);
+                    float y = Mathf.PerlinNoise(x * noiseScale, z * noiseScale) * heightScale * fade;
+                    finalWorldPos = transform.TransformPoint(new Vector3(x, y, z));
+                }
+
+                finalWorldPos.y -= 0.15f;
+
+                grassPositions.Add(finalWorldPos);
+                grassNormals.Add(finalNormal);
+            }
+            if (grassPositions.Count >= maxGrassPoints) break;
+        }
+
+        int batchCount = Mathf.CeilToInt(grassPositions.Count / 1023f);
+        grassBatches = new Matrix4x4[batchCount][];
+
+        Vector3 lossyScale = transform.lossyScale;
+        if (lossyScale.x == 0) lossyScale.x = 1;
+        if (lossyScale.y == 0) lossyScale.y = 1;
+        if (lossyScale.z == 0) lossyScale.z = 1;
+
+        for (int b = 0; b < batchCount; b++)
+        {
+            int start = b * 1023;
+            int count = Mathf.Min(1023, grassPositions.Count - start);
+            grassBatches[b] = new Matrix4x4[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 pos = grassPositions[start + i];
+                Vector3 normal = grassNormals[start + i];
+
+                Quaternion groundTilt = Quaternion.FromToRotation(Vector3.up, normal);
+                Quaternion yaw = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+                Quaternion randomTilt = Quaternion.Euler(Random.Range(-5f, 5f), 0f, Random.Range(-5f, 5f));
+                Quaternion rot = groundTilt * yaw * randomTilt;
+
+                float randomScale = Random.Range(grassMinScale, grassMaxScale);
+                Vector3 finalScale = new Vector3(
+                    randomScale * lossyScale.x,
+                    randomScale * lossyScale.y,
+                    randomScale * lossyScale.z
+                );
+
+                grassBatches[b][i] = Matrix4x4.TRS(pos, rot, finalScale);
             }
         }
+
+        // Выводим точное количество в консоль для проверки
+        Debug.Log($"[Трава] Сгенерировано точек: {grassPositions.Count}, создано батчей: {batchCount}");
     }
 
-    GameObject GetRandomPrefab()
+    // ---- Вспомогательный класс: поле расстояний ----
+    class DistanceField
     {
-        float totalWeight = 0f;
-        foreach (var item in sceneryPrefabs) totalWeight += item.spawnWeight;
+        private float[] distances;
+        private int gridSize;
+        private float chunkWidth, chunkLength;
+        private Transform chunkTransform;
 
-        float randomValue = Random.Range(0f, totalWeight);
-        float currentWeight = 0f;
-
-        foreach (var item in sceneryPrefabs)
+        public DistanceField(List<Renderer> obstacles, float width, float length, int gridRes, Transform trans)
         {
-            currentWeight += item.spawnWeight;
-            if (randomValue <= currentWeight) return item.prefab;
+            chunkWidth = width;
+            chunkLength = length;
+            gridSize = gridRes;
+            chunkTransform = trans;
+            distances = new float[gridSize * gridSize];
+
+            if (obstacles.Count == 0)
+            {
+                for (int i = 0; i < distances.Length; i++)
+                    distances[i] = float.MaxValue;
+                return;
+            }
+
+            float stepX = width / (gridSize - 1);
+            float stepZ = length / (gridSize - 1);
+            for (int z = 0; z < gridSize; z++)
+            {
+                for (int x = 0; x < gridSize; x++)
+                {
+                    Vector3 localPos = new Vector3(x * stepX - width * 0.5f, 0, z * stepZ);
+                    Vector3 worldPos = trans.TransformPoint(localPos);
+                    float minDist = float.MaxValue;
+                    foreach (var r in obstacles)
+                    {
+                        float d = Mathf.Sqrt(r.bounds.SqrDistance(worldPos));
+                        if (d < minDist) minDist = d;
+                    }
+                    distances[z * gridSize + x] = minDist;
+                }
+            }
         }
-        return sceneryPrefabs[0].prefab;
+
+        public float SampleDistance(Vector3 worldPoint)
+        {
+            Vector3 local = chunkTransform.InverseTransformPoint(worldPoint);
+            float u = (local.x + chunkWidth * 0.5f) / chunkWidth;
+            float v = local.z / chunkLength;
+            u = Mathf.Clamp01(u);
+            v = Mathf.Clamp01(v);
+
+            float x = u * (gridSize - 1);
+            float z = v * (gridSize - 1);
+            int x0 = Mathf.FloorToInt(x);
+            int z0 = Mathf.FloorToInt(z);
+            int x1 = Mathf.Min(x0 + 1, gridSize - 1);
+            int z1 = Mathf.Min(z0 + 1, gridSize - 1);
+            float fx = x - x0;
+            float fz = z - z0;
+
+            float d00 = distances[z0 * gridSize + x0];
+            float d10 = distances[z0 * gridSize + x1];
+            float d01 = distances[z1 * gridSize + x0];
+            float d11 = distances[z1 * gridSize + x1];
+
+            float d0 = Mathf.Lerp(d00, d10, fx);
+            float d1 = Mathf.Lerp(d01, d11, fx);
+            return Mathf.Lerp(d0, d1, fz);
+        }
     }
-
-
 }

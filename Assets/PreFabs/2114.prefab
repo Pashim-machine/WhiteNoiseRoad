@@ -122,7 +122,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: a0f1981304adf464683cda53eaf710eb, type: 2}
     - target: {fileID: 919132149155446097, guid: 755635f116c79f24295a375a241ce23b, type: 3}
       propertyPath: m_Name
-      value: PlayerCar
+      value: 2114
       objectReference: {fileID: 0}
     - target: {fileID: 5731924985837205830, guid: 755635f116c79f24295a375a241ce23b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
