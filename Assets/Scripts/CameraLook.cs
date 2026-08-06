@@ -9,34 +9,52 @@ public class CameraLook : MonoBehaviour
     public float minYAngle = -80f;
 
     [Header("Плавность")]
-    public bool enableSmoothing = true;
-    public float smoothSpeed = 15f;
+    public float rotationSmoothTime = 0.12f; // Время сглаживания поворота
 
     [Header("Эффекты погружения")]
     public Camera targetCamera;
     public Rigidbody carRigidbody;
     public float baseFOV = 60f;
-    public float maxSpeedForFOV = 30f; // При какой скорости FOV максимальный
-    public float maxFOVPenalty = 15f;  // На сколько градусов расширяем зрение
-    public float shakeIntensity = 0.03f; // Сила тряски
+    public float maxSpeedForFOV = 30f;
+    public float maxFOVPenalty = 15f;
+    public float shakeIntensity = 0.05f;
+    public float shakeFrequency = 15f; // Скорость тряски
 
+    [Header("G-Force (Наклон в поворотах)")]
+    public float maxRollAngle = 4f; // Максимальный наклон камеры в градусах
+    public float rollSmoothSpeed = 5f;
+
+    // Приватные переменные
     private float rotationX = 0f;
     private float rotationY = 0f;
-    private Quaternion targetRotation;
     private Vector3 originalLocalPosition;
+    private float currentRoll = 0f;
+    private float yawVelocity; // Для SmoothDamp
+    private float pitchVelocity; // Для SmoothDamp
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        targetRotation = transform.localRotation;
         originalLocalPosition = transform.localPosition;
 
-        if (targetCamera == null) targetCamera = GetComponent<Camera>();
+        if (targetCamera == null) targetCamera = GetComponentInChildren<Camera>();
+        if (carRigidbody == null) carRigidbody = GetComponentInParent<Rigidbody>();
     }
 
     void Update()
+    {
+        HandleMouseLook();
+    }
+
+    void LateUpdate()
+    {
+        HandleKeyboardInputs();
+        ApplyCameraEffects();
+    }
+
+    private void HandleMouseLook()
     {
         if (Mouse.current != null && Cursor.lockState == CursorLockMode.Locked)
         {
@@ -46,20 +64,21 @@ public class CameraLook : MonoBehaviour
             rotationY += mouseX;
             rotationX -= mouseY;
             rotationX = Mathf.Clamp(rotationX, minYAngle, maxYAngle);
-
-            targetRotation = Quaternion.Euler(rotationX, rotationY, 0);
-
-            if (enableSmoothing)
-                transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, smoothSpeed * Time.deltaTime);
-            else
-                transform.localRotation = targetRotation;
         }
-    }
 
-    void LateUpdate()
-    {
-        HandleKeyboardInputs();
-        ApplyCameraEffects();
+        // Плавное вращение с помощью SmoothDampAngle (убирает рывки мыши)
+        float smoothYaw = Mathf.SmoothDampAngle(transform.localEulerAngles.y, rotationY, ref yawVelocity, rotationSmoothTime);
+        float smoothPitch = Mathf.SmoothDampAngle(transform.localEulerAngles.x, rotationX, ref pitchVelocity, rotationSmoothTime);
+
+        // Наклон камеры (Roll) при повороте машины
+        Vector3 localVel = carRigidbody.transform.InverseTransformDirection(carRigidbody.linearVelocity);
+        // Если машина скользит вбок (дрифт) или поворачивает, наклоняем камеру
+        float targetRoll = -localVel.x * maxRollAngle * 0.1f;
+        targetRoll = Mathf.Clamp(targetRoll, -maxRollAngle, maxRollAngle);
+        currentRoll = Mathf.Lerp(currentRoll, targetRoll, Time.deltaTime * rollSmoothSpeed);
+
+        // Применяем финальное вращение (X - вверх/вниз, Y - влево/вправо, Z - наклон в повороте)
+        transform.localRotation = Quaternion.Euler(smoothPitch, smoothYaw, currentRoll);
     }
 
     private void HandleKeyboardInputs()
@@ -70,8 +89,8 @@ public class CameraLook : MonoBehaviour
         {
             rotationX = 0f;
             rotationY = 0f;
-            targetRotation = Quaternion.Euler(0, 0, 0);
-            transform.localRotation = targetRotation;
+            yawVelocity = 0f;
+            pitchVelocity = 0f;
         }
 
         if (Keyboard.current[Key.Escape].wasPressedThisFrame)
@@ -85,20 +104,28 @@ public class CameraLook : MonoBehaviour
     {
         if (targetCamera == null || carRigidbody == null) return;
 
-        // 1. Динамический FOV (чувство скорости)
         float currentSpeed = carRigidbody.linearVelocity.magnitude;
         float speedRatio = Mathf.Clamp01(currentSpeed / maxSpeedForFOV);
+
+        // 1. Динамический FOV
         float targetFOV = baseFOV + (maxFOVPenalty * speedRatio);
         targetCamera.fieldOfView = Mathf.Lerp(targetCamera.fieldOfView, targetFOV, Time.deltaTime * 5f);
 
-        // 2. Camera Shake (Тряска от скорости)
+        // 2. Плавная тряска на шумах Перлина (никаких резких рывков)
         if (currentSpeed > 1f)
         {
-            Vector3 shakeOffset = Random.insideUnitSphere * shakeIntensity * speedRatio;
+            float shakeMultiplier = speedRatio * shakeIntensity;
+
+            // Генерируем плавный псевдо-случайный шум
+            float shakeX = (Mathf.PerlinNoise(Time.time * shakeFrequency, 0f) - 0.5f) * 2f * shakeMultiplier;
+            float shakeY = (Mathf.PerlinNoise(0f, Time.time * shakeFrequency) - 0.5f) * 2f * shakeMultiplier;
+
+            Vector3 shakeOffset = new Vector3(shakeX, shakeY, 0f);
             transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition + shakeOffset, Time.deltaTime * 10f);
         }
         else
         {
+            // Плавное возвращение в центр при остановке
             transform.localPosition = Vector3.Lerp(transform.localPosition, originalLocalPosition, Time.deltaTime * 5f);
         }
     }

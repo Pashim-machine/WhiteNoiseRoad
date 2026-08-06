@@ -138,7 +138,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
+  m_RayTraceProcedural: 1
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
@@ -191,11 +191,11 @@ MonoBehaviour:
   flatZoneRadius: 6
   blendZone: 15
   grassQuadMesh: {fileID: 0}
-  grassMaterial: {fileID: 2846381746997063659, guid: 6d57b5c2ab55361448d76f726a174561, type: 3}
-  grassStep: 1.5
+  grassMaterial: {fileID: 2100000, guid: ed0666338014955488862f7d87e0d9aa, type: 2}
+  grassStep: 3
   grassMinScale: 0.1
-  grassMaxScale: 0.5
-  maxGrassPoints: 50000
+  grassMaxScale: 0.2
+  maxGrassPoints: 100000
 --- !u!114 &5868727481754515497
 MonoBehaviour:
   m_ObjectHideFlags: 0
