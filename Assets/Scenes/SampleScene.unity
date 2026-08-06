@@ -1147,12 +1147,12 @@ GameObject:
   - component: {fileID: 429091853}
   - component: {fileID: 429091854}
   m_Layer: 0
-  m_Name: RoadManager
+  m_Name: RoadGenerator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &429091853
 Transform:
   m_ObjectHideFlags: 0
@@ -1180,44 +1180,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11c12905920beaf44b8049f30eb1960c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoadGenerator
-  straightPrefabs:
-  - {fileID: 3059767298681398168, guid: a34469498081c6d4eb36aaf3b4d82959, type: 3}
-  - {fileID: 3463340205550070275, guid: 0e4910847ee51924eb1c52950018f0c6, type: 3}
-  - {fileID: 6475487107948074954, guid: e33dbb790ebf6b94099bbff8743a6f7b, type: 3}
-  leftPrefabs:
-  - {fileID: 1723953122851249646, guid: b3f795831bc386342b45356de453e86d, type: 3}
-  - {fileID: 3463340205550070275, guid: 0e4910847ee51924eb1c52950018f0c6, type: 3}
-  rightPrefabs:
-  - {fileID: 1723953122851249646, guid: a90ede86941fe5b4a9aa6451113e3879, type: 3}
-  - {fileID: 6475487107948074954, guid: e33dbb790ebf6b94099bbff8743a6f7b, type: 3}
-  environmentPrefabs:
-  - {fileID: 8025208051326342902, guid: 1472b24bc247bbf419e0a50a802da085, type: 3}
-  - {fileID: 919132149155446097, guid: e514ddaa52b9e2142adeb3493869be3a, type: 3}
-  - {fileID: 1471485853556596838, guid: fdd98fd2b6331d4448cec37a7e65f3d3, type: 3}
-  - {fileID: 804577501927150747, guid: e96725bcafcd633479627ffe629d4b1d, type: 3}
-  - {fileID: 6669980251079048759, guid: abe0c2b36b02a3042b2d7b09fe387897, type: 3}
-  - {fileID: 2163856231507138439, guid: 494cecf71362af64f9f6dd8b657c619c, type: 3}
-  - {fileID: 919132149155446097, guid: ede620dc31cfb28469a4b35ce0deb8f7, type: 3}
-  - {fileID: 3213720918472383910, guid: af87dae3611540f498bd04a3e8955a58, type: 3}
-  - {fileID: 919132149155446097, guid: f558eec70a6af7a4db48e5ad46bab3eb, type: 3}
-  - {fileID: 2245152065503751760, guid: 4d95095eafec7b74ebbd938669290339, type: 3}
-  - {fileID: 5858898667958029996, guid: 9f97795d6e8c0ef48912810c78d39298, type: 3}
-  - {fileID: 919132149155446097, guid: 91b57ec685486a744b5d6e3c1ecb030a, type: 3}
-  - {fileID: 178657432713521969, guid: d98691ffb222c8c4589647df8bad2163, type: 3}
-  - {fileID: 4442996023627617474, guid: 0da19635f19a70848a41d8bf91491e68, type: 3}
-  - {fileID: 5121512815615499271, guid: 9ddda69a3c0cb144cab3ae45534f3ac4, type: 3}
-  - {fileID: 919132149155446097, guid: 53cdbef058d77ac40a79f1ab2b3ec065, type: 3}
-  - {fileID: 4170886747115205740, guid: 4f3d0b14f0fbddf4da81e9fde7a8b703, type: 3}
-  objectsPerChunk: 5
-  roadWidth: 6
-  envZoneWidth: 15
-  chunkLength: 20
-  player: {fileID: 0}
-  maxChunksAhead: 30
-  destroyDistance: 500
-  minDistanceBetweenRoads: 30
-  straightChance: 75
-  maxConsecutiveTurns: 2
+  chunkPrefabs:
+  - {fileID: 8133257200008671058, guid: dc453d1fb7f4fd34da01c241d5ed44bf, type: 3}
+  - {fileID: 8133257200008671058, guid: 1e4ae575e06106d4aa63ea743bab6a55, type: 3}
+  player: {fileID: 1990921205}
+  maxChunksAhead: 3
+  destroyDistance: 1000
 --- !u!4 &893060323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8897093224900880590, guid: a47596397196fb441bb70b2f6cd51d2b, type: 3}
@@ -2067,7 +2035,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1523174630
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2075,7 +2043,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1523174629}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b39b6b7363a990439b3df695252bad9, type: 3}
   m_Name: 
