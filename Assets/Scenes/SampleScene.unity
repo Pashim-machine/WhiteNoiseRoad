@@ -1178,6 +1178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoadGenerator
   chunkPrefabs:
   - {fileID: 8133257200008671058, guid: 1e4ae575e06106d4aa63ea743bab6a55, type: 3}
+  - {fileID: 8133257200008671058, guid: dc453d1fb7f4fd34da01c241d5ed44bf, type: 3}
   player: {fileID: 1990921205}
   maxChunksAhead: 3
   destroyDistance: 1000
