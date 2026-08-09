@@ -144,7 +144,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ed0666338014955488862f7d87e0d9aa, type: 2}
+  - {fileID: 2100000, guid: 8e333dfc552225c48998944126b43751, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -194,28 +194,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 413c57303d1e77d45965f13c423ea9cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChunkGroundGenerator
-  resolution: 50
-  heightScale: 10
+  resolution: 128
+  collisionResolution: 64
+  heightScale: 5
   noiseScale: 0.02
   flatZoneRadius: 8
   blendZone: 15
   edgeBlendZone: 20
   terrainPadding: 40
-  grassMaterial: {fileID: 2100000, guid: a7b8d315ea376074db4bc709bac886d5, type: 2}
-  grassStep: 0.2
-  grassMinScale: 0.7
-  grassMaxScale: 1.3
-  grassWidth: 0.4
-  renderDistance: 100
-  grassCellSize: 10
-  maxGrassUpdateInterval: 2
-  lodDistance: 60
-  environmentGridStep: 12
-  environmentPrefabs: []
-  grassDensity: 1
+  grassMaterial: {fileID: 2100000, guid: 5ef5cceff1dc8e449991bbadc78a8ca2, type: 2}
+  grassPatchSize: 1
+  grassMeshVariants: 4
+  bladesLOD0: 96
+  bladesLOD1: 25
+  grassMinScale: 0.8
+  grassMaxScale: 1.2
+  grassWidth: 0.8
+  grassDensity: 0.9
   grassRoadMargin: 2.5
   grassTransitionZone: 8
   grassNearRoadDensity: 0.2
+  lod0Density: 1
+  lod1Density: 0.9
+  lod2Density: 0.6
+  grassLOD0Distance: 50
+  grassLOD1Distance: 100
+  grassLOD2Distance: 125
+  grassRenderDistance: 300
+  maxGrassUpdateInterval: 2
+  environmentGridStep: 12
+  environmentPrefabs: []
 --- !u!1001 &84596790509188045
 PrefabInstance:
   m_ObjectHideFlags: 0
