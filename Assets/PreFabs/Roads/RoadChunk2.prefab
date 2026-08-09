@@ -191,12 +191,14 @@ MonoBehaviour:
   blendZone: 15
   edgeBlendZone: 20
   terrainPadding: 60
-  grassQuadMesh: {fileID: 0}
-  grassMaterial: {fileID: 2100000, guid: ed0666338014955488862f7d87e0d9aa, type: 2}
-  grassStep: 3
-  grassMinScale: 0.1
-  grassMaxScale: 0.2
-  maxGrassPoints: 100000
+  grassMaterial: {fileID: 2100000, guid: a7b8d315ea376074db4bc709bac886d5, type: 2}
+  grassStep: 0.4
+  grassMinScale: 0.5
+  grassMaxScale: 1
+  grassWidth: 0.6
+  renderDistance: 150
+  grassCellSize: 10
+  maxGrassUpdateInterval: 3
   environmentGridStep: 10
   environmentPrefabs:
   - prefab: {fileID: 919132149155446097, guid: e514ddaa52b9e2142adeb3493869be3a, type: 3}
@@ -223,6 +225,7 @@ MonoBehaviour:
     maxScale: 0
     alignToTerrain: 0
     yOffset: 0
+  playerCar: {fileID: 0}
 --- !u!114 &5868727481754515497
 MonoBehaviour:
   m_ObjectHideFlags: 0

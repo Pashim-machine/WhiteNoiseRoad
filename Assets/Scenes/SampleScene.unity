@@ -1178,7 +1178,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoadGenerator
   chunkPrefabs:
   - {fileID: 8133257200008671058, guid: 1e4ae575e06106d4aa63ea743bab6a55, type: 3}
-  - {fileID: 8133257200008671058, guid: dc453d1fb7f4fd34da01c241d5ed44bf, type: 3}
   player: {fileID: 1990921205}
   maxChunksAhead: 3
   destroyDistance: 1000
@@ -7865,7 +7864,7 @@ Transform:
   m_GameObject: {fileID: 1877198789}
   serializedVersion: 2
   m_LocalRotation: {x: 0.07027874, y: 0, z: 0, w: 0.9975274}
-  m_LocalPosition: {x: -0.36, y: 1.21, z: -0.25}
+  m_LocalPosition: {x: -0.37, y: 1.21, z: -0.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8390,10 +8389,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1469678075}
-  - {fileID: 1877198790}
   - {fileID: 1610818599}
   - {fileID: 376638819}
   - {fileID: 1863565253}
+  - {fileID: 1877198790}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2042491126 stripped
