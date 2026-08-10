@@ -397,6 +397,16 @@
         "com.unity.modules.animation": "1.0.0"
       }
     },
+    "com.unity.modules.hierarchy": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.hierarchycore": "1.0.0",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0"
+      }
+    },
     "com.unity.modules.hierarchycore": {
       "version": "1.0.0",
       "depth": 1,
@@ -416,6 +426,12 @@
       "dependencies": {}
     },
     "com.unity.modules.jsonserialize": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
+    "com.unity.modules.nvidia": {
       "version": "1.0.0",
       "depth": 0,
       "source": "builtin",

@@ -235,7 +235,7 @@ Material:
     - _LightmapUV: 0
     - _LinkDetailsWithBase: 1
     - _MaterialID: 1
-    - _Mesh_Scale: 1
+    - _Mesh_Scale: 1.18
     - _Metallic: 0
     - _MetallicRemapMax: 1
     - _MetallicRemapMin: 0

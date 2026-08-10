@@ -213,7 +213,7 @@ MonoBehaviour:
     supportSSR: 1
     supportSSRTransparent: 1
     supportSSAO: 1
-    supportSSGI: 0
+    supportSSGI: 1
     supportSubsurfaceScattering: 1
     subsurfaceScatteringAttenuation: 1
     sssSampleBudget:
@@ -287,7 +287,7 @@ MonoBehaviour:
     supportVFXRayTracing: 1
     supportedRayTracingMode: 3
     lightLoopSettings:
-      cookieAtlasSize: 2048
+      cookieAtlasSize: 8192
       cookieFormat: 74
       cookieAtlasLastValidMip: 0
       cookieTexArraySize: 1
@@ -365,12 +365,14 @@ MonoBehaviour:
       lutFormat: 48
       bufferFormat: 74
     dynamicResolutionSettings:
-      enabled: 0
+      enabled: 1
       useMipBias: 0
       advancedUpscalersByPriority: 
       advancedUpscalerNames:
+      - DLSS
+      - FSR2
       - STP
-      DLSSPerfQualitySetting: 0
+      DLSSPerfQualitySetting: 2
       DLSSInjectionPoint: 0
       TAAUInjectionPoint: 0
       STPInjectionPoint: 0
@@ -384,7 +386,7 @@ MonoBehaviour:
       DLSSRenderPresetForDLAA: 0
       FSR2EnableSharpness: 0
       FSR2Sharpness: 0
-      FSR2UseOptimalSettings: 0
+      FSR2UseOptimalSettings: 1
       FSR2QualitySetting: 0
       FSR2InjectionPoint: 0
       fsrOverrideSharpness: 0
@@ -392,7 +394,7 @@ MonoBehaviour:
       maxPercentage: 100
       minPercentage: 100
       dynResType: 1
-      upsampleFilter: 1
+      upsampleFilter: 4
       forceResolution: 0
       forcedPercentage: 100
       lowResTransparencyMinimumThreshold: 0

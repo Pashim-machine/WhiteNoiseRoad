@@ -2470,7 +2470,7 @@ MonoBehaviour:
     m_Value: 0
   enable:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   cloudTiling:
     m_OverrideState: 1
     m_Value: {x: 1, y: 1}
@@ -2511,7 +2511,7 @@ MonoBehaviour:
     m_Value: 0
   cloudSimpleMode:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   m_CloudPreset:
     m_OverrideState: 1
     m_Value: 1
@@ -2662,7 +2662,7 @@ MonoBehaviour:
     m_Value: 0.4
   shapeFactor:
     m_OverrideState: 1
-    m_Value: 0.9
+    m_Value: 0.875
   shapeScale:
     m_OverrideState: 1
     m_Value: 5
@@ -2671,10 +2671,10 @@ MonoBehaviour:
     m_Value: {x: 0, y: 0, z: 0}
   erosionFactor:
     m_OverrideState: 1
-    m_Value: 0.8
+    m_Value: 0.9
   erosionScale:
     m_OverrideState: 1
-    m_Value: 107
+    m_Value: 75
   erosionNoiseType:
     m_OverrideState: 1
     m_Value: 1
@@ -2683,10 +2683,10 @@ MonoBehaviour:
     m_Value: 0
   microErosionFactor:
     m_OverrideState: 1
-    m_Value: 0.5
+    m_Value: 0.65
   microErosionScale:
     m_OverrideState: 1
-    m_Value: 200
+    m_Value: 300
   ambientLightProbeDimmer:
     m_OverrideState: 1
     m_Value: 1
@@ -2739,7 +2739,7 @@ MonoBehaviour:
     m_Value: 1
   shadows:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   shadowResolution:
     m_OverrideState: 1
     m_Value: 256
