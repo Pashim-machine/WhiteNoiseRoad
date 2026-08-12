@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: e33dbb790ebf6b94099bbff8743a6f7b
+guid: f9ff3e2c4871c4b4b84b19893079fc22
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 212360
-  packageName: Simple Roads
-  packageVersion: 1.0.1
-  assetPath: Assets/Simple Roads/Prefabs/road curve.prefab
-  uploadId: 520970

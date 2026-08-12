@@ -4,112 +4,170 @@ using UnityEngine;
 public class RoadGenerator : MonoBehaviour
 {
     [Header("Префабы чанков (с RoadChunk и ChunkGroundGenerator)")]
-    [Tooltip("Просто перетащи сюда все варианты твоих чанков")]
     public GameObject[] chunkPrefabs;
 
     [Header("Привязка к игроку")]
-    [Tooltip("Трансформ игрока или машины, за которым следит генератор")]
     public Transform player;
 
     [Header("Настройки спавна")]
-    [Tooltip("Сколько чанков должно быть впереди игрока")]
-    public int maxChunksAhead = 10;
-    [Tooltip("Дистанция позади игрока, после которой чанк удаляется")]
-    public float destroyDistance = 80f;
+    [Tooltip("Конец дороги всегда держится минимум в этой дистанции ВПЕРЕДИ игрока. Ставь ~1.5-2 длины чанка.")]
+    public float aheadDistance = 300f;
+    [Tooltip("Дистанция ПОЗАДИ игрока, после которой чанк удаляется. Большое значение = можно ехать назад.")]
+    public float destroyDistance = 1000f;
+    [Tooltip("Предохранитель памяти: максимум ОДНОВРЕМЕННЫХ чанков. Не блокирует спавн в нормальной игре.")]
+    public int maxTotalChunks = 40;
 
-    private List<GameObject> spawnedChunks = new List<GameObject>();
-    private Transform lastEndPoint;
+    private readonly List<GameObject> spawnedChunks = new List<GameObject>();
+
+    // Копия точки стыковки вместо ссылки на Transform убитого чанка
+    private Vector3 anchorPos;
+    private Quaternion anchorRot = Quaternion.identity;
+    private bool hasAnchor;
+
+    private float nextRetryTime;
+    private bool capWarned;
 
     void Start()
     {
-        if (chunkPrefabs == null || chunkPrefabs.Length == 0 || !player) return;
-
-        // Спавним случайный первый чанк
-        int firstIndex = Random.Range(0, chunkPrefabs.Length);
-        SpawnChunk(chunkPrefabs[firstIndex], true);
-
-        while (spawnedChunks.Count < maxChunksAhead)
+        if (chunkPrefabs == null || chunkPrefabs.Length == 0)
         {
-            SpawnNextChunk();
+            Debug.LogError("[RoadGenerator] chunkPrefabs пуст!");
+            return;
         }
+        if (player == null)
+        {
+            Debug.LogError("[RoadGenerator] Не назначен player!");
+            return;
+        }
+
+        SpawnNextChunkSafe(true);
+        ExtendRoad(); // сразу наращиваем дорогу вперёд по aheadDistance
+
+        Debug.Log($"[RoadGenerator] Старт: собрано чанков {spawnedChunks.Count}");
     }
 
     void Update()
     {
-        if (player == null || spawnedChunks.Count == 0) return;
+        if (player == null) return;
 
-        // Проверяем самый старый чанк (который позади)
-        GameObject oldestChunk = spawnedChunks[0];
-
-        // Считаем дистанцию от игрока до старого чанка
-        float distanceToOldest = Vector3.Distance(player.position, oldestChunk.transform.position);
-
-        // Если игрок уехал достаточно далеко вперед — удаляем старый и генерим новый впереди
-        if (distanceToOldest > destroyDistance && player.position.z > oldestChunk.transform.position.z)
+        // 1. Отрезаем хвост только после destroyDistance (можно ехать назад)
+        while (spawnedChunks.Count > 0)
         {
-            Destroy(oldestChunk);
-            spawnedChunks.RemoveAt(0);
+            GameObject oldest = spawnedChunks[0];
+            if (oldest == null) { spawnedChunks.RemoveAt(0); continue; }
+            if (Vector3.Distance(player.position, oldest.transform.position) > destroyDistance)
+            {
+                Debug.Log($"[RoadGenerator] Удалил чанк позади: {oldest.name}");
+                Destroy(oldest);
+                spawnedChunks.RemoveAt(0);
+            }
+            else break;
+        }
 
-            SpawnNextChunk();
+        // 2. Достраиваем вперёд: единственное условие — конец дороги ближе aheadDistance
+        ExtendRoad();
+    }
+
+    void ExtendRoad()
+    {
+        int guard = 0;
+        while (guard++ < 16)
+        {
+            if (Time.time < nextRetryTime) break;
+            if (spawnedChunks.Count >= maxTotalChunks)
+            {
+                if (!capWarned)
+                {
+                    capWarned = true;
+                    Debug.LogWarning($"[RoadGenerator] Достигнут лимит maxTotalChunks={maxTotalChunks}. Увеличь его, если чанки короткие.");
+                }
+                break;
+            }
+            // Конец дороги достаточно далеко — спавнить не нужно
+            if (hasAnchor && Vector3.Distance(player.position, anchorPos) > aheadDistance) break;
+
+            if (SpawnNextChunkSafe(false)) continue;
+            nextRetryTime = Time.time + 2f;
+            break;
         }
     }
 
-    void SpawnNextChunk()
+    bool SpawnNextChunkSafe(bool isFirstChunk)
     {
-        int index = Random.Range(0, chunkPrefabs.Length);
-        Debug.Log($"Спавним чанк с индексом: {index} — {chunkPrefabs[index].name}");
-        SpawnChunk(chunkPrefabs[index], false);
+        List<GameObject> valid = new List<GameObject>(chunkPrefabs.Length);
+        for (int i = 0; i < chunkPrefabs.Length; i++)
+            if (chunkPrefabs[i] != null) valid.Add(chunkPrefabs[i]);
+
+        if (valid.Count == 0)
+        {
+            Debug.LogError("[RoadGenerator] Все слоты chunkPrefabs пустые (Missing)!");
+            return false;
+        }
+        return SpawnChunk(valid[Random.Range(0, valid.Count)], isFirstChunk);
     }
 
-    void SpawnChunk(GameObject prefab, bool isFirstChunk)
+    bool SpawnChunk(GameObject prefab, bool isFirstChunk)
     {
-        // 1. Создаем чанк
-        GameObject newChunk = Instantiate(prefab);
-
-        // 2. Ищем точки StartPoint и EndPoint (через компонент RoadChunk)
-        RoadChunk roadChunk = newChunk.GetComponent<RoadChunk>();
-
-        Transform startPoint = (roadChunk != null && roadChunk.startPoint != null)
-            ? roadChunk.startPoint
-            : newChunk.transform.Find("StartPoint");
-
-        Transform endPoint = (roadChunk != null && roadChunk.endPoint != null)
-            ? roadChunk.endPoint
-            : newChunk.transform.Find("EndPoint");
-
-        if (startPoint == null || endPoint == null)
+        GameObject newChunk = null;
+        try
         {
-            Debug.LogError($"❌ На префабе '{prefab.name}' не найдены StartPoint или EndPoint! Проверь скрипт RoadChunk.");
-            Destroy(newChunk);
-            return;
-        }
+            newChunk = Instantiate(prefab);
+            SanitizeEmptyMeshes(newChunk);
 
-        // 3. Выравниваем и стыкуем чанк
-        if (isFirstChunk || lastEndPoint == null)
+            RoadChunk roadChunk = newChunk.GetComponent<RoadChunk>();
+            Transform startPoint = (roadChunk != null && roadChunk.startPoint != null)
+                ? roadChunk.startPoint
+                : newChunk.transform.Find("StartPoint");
+            Transform endPoint = (roadChunk != null && roadChunk.endPoint != null)
+                ? roadChunk.endPoint
+                : newChunk.transform.Find("EndPoint");
+
+            if (startPoint == null || endPoint == null)
+            {
+                Debug.LogError($"[RoadGenerator] На префабе '{prefab.name}' нет StartPoint/EndPoint!", prefab);
+                Destroy(newChunk);
+                return false;
+            }
+
+            if (isFirstChunk || !hasAnchor)
+            {
+                newChunk.transform.position = Vector3.zero;
+                newChunk.transform.rotation = Quaternion.identity;
+            }
+            else
+            {
+                newChunk.transform.rotation = anchorRot * Quaternion.Inverse(startPoint.rotation) * newChunk.transform.rotation;
+                newChunk.transform.position += anchorPos - startPoint.position;
+            }
+
+            ChunkGroundGenerator groundGen = newChunk.GetComponent<ChunkGroundGenerator>();
+            if (groundGen != null) groundGen.InitChunk();
+
+            anchorPos = endPoint.position;
+            anchorRot = endPoint.rotation;
+            hasAnchor = true;
+
+            spawnedChunks.Add(newChunk);
+            Debug.Log($"[RoadGenerator] Спавн: {newChunk.name} (всего {spawnedChunks.Count})");
+            return true;
+        }
+        catch (System.Exception e)
         {
-            newChunk.transform.position = Vector3.zero;
-            newChunk.transform.rotation = Quaternion.identity;
+            Debug.LogError($"[RoadGenerator] Исключение при спавне чанка '{prefab.name}':\n{e}",
+                newChunk != null ? newChunk : (Object)this);
+            if (newChunk != null) Destroy(newChunk);
+            return false;
         }
-        else
+    }
+
+    static void SanitizeEmptyMeshes(GameObject go)
+    {
+        MeshFilter[] filters = go.GetComponentsInChildren<MeshFilter>(true);
+        for (int i = 0; i < filters.Length; i++)
         {
-            // Поворачиваем чанк так, чтобы его StartPoint совпал по углу с прошлым EndPoint
-            Quaternion rotationOffset = lastEndPoint.rotation * Quaternion.Inverse(startPoint.rotation);
-            newChunk.transform.rotation = rotationOffset * newChunk.transform.rotation;
-
-            // Сдвигаем чанк строго в позицию прошлого EndPoint
-            Vector3 positionOffset = lastEndPoint.position - startPoint.position;
-            newChunk.transform.position += positionOffset;
+            Mesh m = filters[i].sharedMesh;
+            if (m != null && (m.subMeshCount == 0 || m.vertexCount == 0))
+                filters[i].sharedMesh = null;
         }
-
-        // 4. ТЕПЕРЬ запускаем генерацию земли, когда чанк встал на свое идеальное место!
-        ChunkGroundGenerator groundGen = newChunk.GetComponent<ChunkGroundGenerator>();
-        if (groundGen != null)
-        {
-            groundGen.InitChunk();
-        }
-
-        // 5. Запоминаем новый EndPoint и добавляем в список активных чанков
-        lastEndPoint = endPoint;
-        spawnedChunks.Add(newChunk);
     }
 }

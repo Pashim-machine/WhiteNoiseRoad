@@ -287,7 +287,7 @@ MonoBehaviour:
     supportVFXRayTracing: 1
     supportedRayTracingMode: 3
     lightLoopSettings:
-      cookieAtlasSize: 8192
+      cookieAtlasSize: 16384
       cookieFormat: 74
       cookieAtlasLastValidMip: 0
       cookieTexArraySize: 1
@@ -297,7 +297,7 @@ MonoBehaviour:
       maxEnvLightsOnScreen: 0
       reflectionCacheCompressed: 0
       reflectionProbeFormat: 74
-      reflectionProbeTexCacheSize: 4096
+      reflectionProbeTexCacheSize: 16384
       reflectionProbeTexLastValidCubeMip: 3
       reflectionProbeTexLastValidPlanarMip: 0
       reflectionProbeDecreaseResToFit: 1
