@@ -271,7 +271,7 @@
 
 **Шаг 1: Клонирование репозитория**
 ```bash
-git clone https://github.com/iamfifya/WhiteNoiseRoad.git
+git clone https://github.com/Pashim-machine/WhiteNoiseRoad
 cd WhiteNoiseRoad
 ```
 
