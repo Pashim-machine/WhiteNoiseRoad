@@ -1411,7 +1411,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1194180645}
-  m_Material: {fileID: 13400000, guid: c24d2983fa09bcb46bffa465b446e8d5, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1432,7 +1432,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1194180645}
-  m_Material: {fileID: 13400000, guid: c24d2983fa09bcb46bffa465b446e8d5, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -7684,13 +7684,13 @@ MonoBehaviour:
   rotationSmoothTime: 0.05
   targetCamera: {fileID: 1877198793}
   carRigidbody: {fileID: 1990921203}
-  baseFOV: 90
+  baseFOV: 80
   maxSpeedForFOV: 30
   maxFOVPenalty: 15
   shakeIntensity: 0.005
   shakeFrequency: 15
-  maxRollAngle: 5
-  rollSmoothSpeed: 25
+  maxRollAngle: 1
+  rollSmoothSpeed: 10
 --- !u!1001 &1886983317
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7915,6 +7915,7 @@ GameObject:
   - component: {fileID: 1990921204}
   - component: {fileID: 1990921203}
   - component: {fileID: 1990921207}
+  - component: {fileID: 1990921208}
   m_Layer: 8
   m_Name: CarRoot
   m_TagString: Untagged
@@ -8248,6 +8249,21 @@ MonoBehaviour:
     m_Bits: 4294967295
   debugWheels: 1
   debugLog: 0
+--- !u!114 &1990921208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990921202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
 --- !u!1 &2042491126 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3883992248155159444, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
