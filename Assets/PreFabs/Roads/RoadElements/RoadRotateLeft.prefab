@@ -85,8 +85,16 @@ PrefabInstance:
       value: RoadRotateLeft
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}
       propertyPath: m_TagString
       value: Road
+      objectReference: {fileID: 0}
+    - target: {fileID: 6209950033716336636, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -95,6 +103,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6209950033716336636, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4745797240982071943}
+    - targetCorrespondingSourceObject: {fileID: 6209950033716336636, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7870671106412614333}
   m_SourcePrefab: {fileID: 100100000, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}
 --- !u!1 &6857072843388497293 stripped
 GameObject:
@@ -122,3 +133,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.28, y: 1.9895197e-15, z: 0.28}
   m_Center: {x: 0.02, y: 0.001, z: -0.02}
+--- !u!64 &7870671106412614333
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6857072843388497293}
+  m_Material: {fileID: 13400000, guid: eaf8a712d06b1c14d937e3d2638bd882, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 7468059451467576502, guid: 41b4f7f75e09fcb4a8a6979675bebf27, type: 3}

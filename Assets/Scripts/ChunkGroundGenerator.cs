@@ -10,6 +10,16 @@ public class ChunkGroundGenerator : MonoBehaviour
     public float heightScale = 10f;
     public float noiseScale = 0.02f;
 
+    [Header("Стык земли и дороги")]
+    [Tooltip("Автоопределение высоты асфальта (по коллайдеру дороги или её рендереру)")]
+    public bool autoRoadHeight = true;
+    [Tooltip("Ручная поправка высоты земли у дороги, если авто не попало")]
+    public float roadHeightOffset = 0f;
+    [Tooltip("Насколько земля заходит ПОД асфальт, чтобы не было щели")]
+    public float roadTuck = 0.03f;
+
+    private float roadBaseY;
+
     [Header("Препятствия (дороги, объекты)")]
     public float flatZoneRadius = 8f;
     public float blendZone = 15f;
@@ -167,6 +177,8 @@ public class ChunkGroundGenerator : MonoBehaviour
         width = terrainEndX - terrainStartX; length = terrainEndZ - terrainStartZ;
 
         distanceField = new DistanceField(obstacles, terrainStartX, terrainEndX, terrainStartZ, terrainEndZ, 64, transform);
+        float detected = autoRoadHeight ? DetectRoadHeight(road, obstacles) : 0f;
+        roadBaseY = detected - roadTuck + roadHeightOffset;
         GenerateTerrainMesh();
         BuildTerrainCollisionMesh();
         GenerateEnvironment();
@@ -181,11 +193,59 @@ public class ChunkGroundGenerator : MonoBehaviour
 
     private float CalculateHeight(Vector3 worldPos, float localZ, float dist)
     {
-        if (dist <= flatZoneRadius) return 0f;
-        float fade = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(flatZoneRadius, flatZoneRadius + blendZone, dist));
-        float distToEdgeZ = Mathf.Min(localZ - terrainStartZ, terrainEndZ - localZ);
-        fade *= Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0f, edgeBlendZone, distToEdgeZ));
-        return Mathf.PerlinNoise((worldPos.x + perlinOffsetX) * noiseScale, (worldPos.z + perlinOffsetZ) * noiseScale) * heightScale * fade;
+        // 0 у дороги -> 1 вдали (начинаются холмы)
+        float flatFade = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(flatZoneRadius, flatZoneRadius + blendZone, dist));
+        // гашение холмов у краёв чанка по Z, чтобы чанки стыковались
+        float edgeFade = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0f, edgeBlendZone, Mathf.Min(localZ - terrainStartZ, terrainEndZ - localZ)));
+
+        // У дороги земля держит ВЫСОТУ АСФАЛЬТА, вдали — ноль
+        float baseH = Mathf.Lerp(roadBaseY, 0f, flatFade);
+
+        float hills = Mathf.PerlinNoise((worldPos.x + perlinOffsetX) * noiseScale, (worldPos.z + perlinOffsetZ) * noiseScale) * heightScale;
+
+        // Холмы включаются по мере удаления от дороги и гаснут у краёв чанка.
+        // База (roadBaseY) НЕ гасится у краёв — поэтому земля остаётся в уровень
+        // с дорогой даже на стыке чанков.
+        return baseH + (hills - baseH) * flatFade * edgeFade;
+    }
+
+    /// Определяет высоту полотна дороги: сначала лучом в коллайдер дороги,
+    /// иначе — по верху ближайшего к StartPoint рендерера дороги.
+    /// иначе — по верху ближайшего к StartPoint рендерера дороги.
+    /// Возвращает высоту в ЛОКАЛЬНЫХ координатах чанка (CalculateHeight работает в локале).
+    private float DetectRoadHeight(RoadChunk road, List<Renderer> obstacles)
+    {
+        // 1) Луч сверху вниз в середину дороги: ищем коллайдер дороги внутри чанка
+        if (road != null && road.startPoint != null && road.endPoint != null)
+        {
+            Vector3 mid = (road.startPoint.position + road.endPoint.position) * 0.5f;
+            RaycastHit[] hits = Physics.RaycastAll(mid + Vector3.up * 10f, Vector3.down, 20f);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].transform.IsChildOf(transform) && hits[i].collider.gameObject != gameObject)
+                    return transform.InverseTransformPoint(hits[i].point).y;
+            }
+        }
+
+        // 2) Фолбэк: верх бокса рендерера дороги, ближайшего к StartPoint
+        if (road != null && road.startPoint != null && obstacles.Count > 0)
+        {
+            Renderer best = null;
+            float bestDist = float.MaxValue;
+            for (int i = 0; i < obstacles.Count; i++)
+            {
+                if (obstacles[i] == null) continue;
+                float d = (obstacles[i].bounds.center - road.startPoint.position).sqrMagnitude;
+                if (d < bestDist) { bestDist = d; best = obstacles[i]; }
+            }
+            if (best != null)
+            {
+                Vector3 topWorld = best.bounds.center + Vector3.up * best.bounds.extents.y;
+                return transform.InverseTransformPoint(topWorld).y;
+            }
+        }
+
+        return 0f;
     }
 
     private float SampleTerrainHeight(float localX, float localZ)
