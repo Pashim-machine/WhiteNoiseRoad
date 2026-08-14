@@ -898,7 +898,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize2D: {x: 10, y: 10}
   m_Shadows:
-    m_Type: 1
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -1090,15 +1090,15 @@ MonoBehaviour:
   m_MaxDepthBias: 0.001
   m_ShadowResolution:
     m_Override: 512
-    m_UseOverride: 0
-    m_Level: 3
+    m_UseOverride: 1
+    m_Level: 1
   m_ShadowDimmer: 1
   m_VolumetricShadowDimmer: 1
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
     m_Override: 1
-    m_UseOverride: 0
-    m_Level: 2
+    m_UseOverride: 1
+    m_Level: 0
   m_RayTracedContactShadow: 1
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
   m_PenumbraTint: 0
@@ -1106,7 +1106,7 @@ MonoBehaviour:
   m_SlopeBias: 0.5
   m_ShadowUpdateMode: 0
   m_AlwaysDrawDynamicShadows: 0
-  m_UpdateShadowOnLightMovement: 1
+  m_UpdateShadowOnLightMovement: 0
   m_CachedShadowTranslationThreshold: 0.01
   m_CachedShadowAngularThreshold: 0.5
   m_BarnDoorAngle: 90
@@ -1379,9 +1379,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1194180646}
+  - component: {fileID: 1194180647}
   - component: {fileID: 1194180648}
   - component: {fileID: 1194180649}
-  - component: {fileID: 1194180650}
   m_Layer: 8
   m_Name: BoxCollider_Main
   m_TagString: Untagged
@@ -1404,51 +1404,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 45444049}
   m_LocalEulerAnglesHint: {x: -90, y: 180, z: 0}
---- !u!64 &1194180648
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1194180645}
-  m_Material: {fileID: 13400000, guid: c24d2983fa09bcb46bffa465b446e8d5, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -8545447256379345787, guid: 755635f116c79f24295a375a241ce23b, type: 3}
---- !u!64 &1194180649
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1194180645}
-  m_Material: {fileID: 13400000, guid: c24d2983fa09bcb46bffa465b446e8d5, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 5000571413488527443, guid: 755635f116c79f24295a375a241ce23b, type: 3}
---- !u!65 &1194180650
+--- !u!65 &1194180647
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1465,10 +1421,54 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.8164839, y: 3.0848002, z: 0.4033862}
-  m_Center: {x: -0.05323851, y: 0.0978235, z: 0.36}
+  m_Size: {x: 1.6778115, y: 4.069936, z: 1.231799}
+  m_Center: {x: 0.017805636, y: 0.11810207, z: 0.6181392}
+--- !u!64 &1194180648
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194180645}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 1
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -8545447256379345787, guid: 755635f116c79f24295a375a241ce23b, type: 3}
+--- !u!64 &1194180649
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1194180645}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5000571413488527443, guid: 755635f116c79f24295a375a241ce23b, type: 3}
 --- !u!1 &1469678074
 GameObject:
   m_ObjectHideFlags: 0
@@ -6710,7 +6710,7 @@ MonoBehaviour:
   m_IncludeForRayTracing: 1
   m_IncludeForPathTracing: 1
   m_AreaLightShadowCone: 120
-  m_UseScreenSpaceShadows: 1
+  m_UseScreenSpaceShadows: 0
   m_InteractsWithSky: 1
   m_AngularDiameter: 0.5
   diameterMultiplerMode: 0
@@ -6730,7 +6730,7 @@ MonoBehaviour:
   surfaceTexture: {fileID: 2800000, guid: cce9f0cf7e606e547a7317aedb4ad6d9, type: 3}
   surfaceTint: {r: 1, g: 1, b: 1, a: 1}
   m_Distance: 384400000
-  m_UseRayTracedShadows: 0
+  m_UseRayTracedShadows: 1
   m_NumRayTracingSamples: 4
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16
@@ -6761,15 +6761,15 @@ MonoBehaviour:
   m_MaxDepthBias: 0.001
   m_ShadowResolution:
     m_Override: 512
-    m_UseOverride: 0
-    m_Level: 3
+    m_UseOverride: 1
+    m_Level: 0
   m_ShadowDimmer: 1
   m_VolumetricShadowDimmer: 1
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
     m_Override: 1
-    m_UseOverride: 0
-    m_Level: 2
+    m_UseOverride: 1
+    m_Level: 0
   m_RayTracedContactShadow: 1
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
   m_PenumbraTint: 0
@@ -7418,7 +7418,7 @@ Transform:
   m_GameObject: {fileID: 1877198789}
   serializedVersion: 2
   m_LocalRotation: {x: 0.06975647, y: 0, z: 0, w: 0.9975641}
-  m_LocalPosition: {x: -0.3, y: 1.21, z: -0.13}
+  m_LocalPosition: {x: -2.05, y: 1.21, z: -0.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7684,13 +7684,13 @@ MonoBehaviour:
   rotationSmoothTime: 0.05
   targetCamera: {fileID: 1877198793}
   carRigidbody: {fileID: 1990921203}
-  baseFOV: 90
+  baseFOV: 80
   maxSpeedForFOV: 30
   maxFOVPenalty: 15
   shakeIntensity: 0.005
   shakeFrequency: 15
-  maxRollAngle: 5
-  rollSmoothSpeed: 25
+  maxRollAngle: 1
+  rollSmoothSpeed: 10
 --- !u!1001 &1886983317
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8231,7 +8231,7 @@ MonoBehaviour:
   yawRateDamper: 400
   antiRolloverTorque: 2500
   maxStableRollDeg: 30
-  rollRateDamper: 4500
+  rollRateDamper: 3000
   pitchRateDamper: 2000
   wheelSpinAxis: {x: 1, y: 0, z: 0}
   wheelSpinDirection: -1

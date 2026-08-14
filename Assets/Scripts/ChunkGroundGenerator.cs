@@ -45,6 +45,12 @@ public class ChunkGroundGenerator : MonoBehaviour
     [Range(0.05f, 1f)] public float lod1Density = 0.5f;
     [Range(0.05f, 1f)] public float lod2Density = 0.2f;
 
+    [Header("Трава: тени")]
+    [Tooltip("Отбрасывает ли трава тени вообще")]
+    public bool grassCastShadows = true;
+    [Tooltip("Максимальный LOD, который отбрасывает тень: 0 = только ближняя трава")]
+    [Range(0, 2)] public int shadowMaxLOD = 0;
+
     [Header("Трава: LOD дистанции")]
     public float grassLOD0Distance = 25f;
     public float grassLOD1Distance = 55f;
@@ -533,6 +539,7 @@ public class ChunkGroundGenerator : MonoBehaviour
         mesh.uv = uvs;
         mesh.triangles = tris;
         mesh.RecalculateBounds();
+        mesh.RecalculateNormals(); // <--- Обязательно добавь эту строчку
         return mesh;
     }
 
@@ -689,6 +696,13 @@ public class ChunkGroundGenerator : MonoBehaviour
             Mesh mesh = streamMeshes[s];
             if (mesh == null) continue;
 
+            // Тень отбрасывает только ближний LOD (и те, что разрешил shadowMaxLOD)
+            int lod = s / variantCount;
+            UnityEngine.Rendering.ShadowCastingMode cast =
+                (grassCastShadows && lod <= shadowMaxLOD)
+                ? UnityEngine.Rendering.ShadowCastingMode.On
+                : UnityEngine.Rendering.ShadowCastingMode.Off;
+
             Matrix4x4[] buffer = streamMatrices[s];
             int index = 0;
             while (index < count)
@@ -698,8 +712,9 @@ public class ChunkGroundGenerator : MonoBehaviour
                 Graphics.DrawMeshInstanced(
                     mesh, 0, grassMaterial,
                     batchMatrices, batch, null,
-                    UnityEngine.Rendering.ShadowCastingMode.Off,
-                    false, 0, cachedCamera);
+                    cast,
+                    true,
+                    0, null); // Убрали ограничение по камере
                 index += batch;
             }
         }

@@ -122,6 +122,18 @@ public class CarPhysics : MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rb.maxAngularVelocity = 12f;
         rb.sleepThreshold = 0.005f;
+
+        // Жёсткий сброс параметров, которые Unity любит перезаписывать из Inspector
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        rb.constraints = RigidbodyConstraints.None;
+        rb.linearDamping = 0f;
+        rb.angularDamping = angularDamping;
+        rb.maxDepenetrationVelocity = 10f;
+
+        // Диагностический лог при старте — сразу видно, если что-то не так
+        Debug.Log($"[CarPhysics] mass={rb.mass} drag={rb.linearDamping} kinematic={rb.isKinematic} " +
+                  $"constraints={rb.constraints} gravity={rb.useGravity}", this);
     }
 
     void Start()
