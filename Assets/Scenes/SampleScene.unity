@@ -145,13 +145,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 30103809}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -23.84078, y: 0.911, z: -38.7279}
+  m_LocalRotation: {x: 0.043619405, y: 0, z: 0, w: 0.9990483}
+  m_LocalPosition: {x: -23.84078, y: 0.911, z: -38.66}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 376638819}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 5, y: 0, z: 0}
 --- !u!114 &30103811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,7 +200,7 @@ MonoBehaviour:
   m_IESSpot: {fileID: 0}
   m_IncludeForRayTracing: 1
   m_IncludeForPathTracing: 1
-  m_AreaLightShadowCone: 120
+  m_AreaLightShadowCone: 10
   m_UseScreenSpaceShadows: 0
   m_InteractsWithSky: 1
   m_AngularDiameter: 0.5
@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Distance: 1.5e+11
   m_UseRayTracedShadows: 1
   m_NumRayTracingSamples: 4
-  m_FilterTracedShadow: 1
+  m_FilterTracedShadow: 0
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
   m_SemiTransparentShadow: 0
@@ -235,7 +235,7 @@ MonoBehaviour:
   m_EvsmBlurPasses: 0
   m_LightlayersMask: 1
   m_LinkShadowLayers: 1
-  m_ShadowNearPlane: 0.1
+  m_ShadowNearPlane: 0
   m_BlockerSampleCount: 24
   m_FilterSampleCount: 16
   m_MinFilterSize: 0.1
@@ -259,9 +259,9 @@ MonoBehaviour:
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
     m_Override: 1
-    m_UseOverride: 1
-    m_Level: 0
-  m_RayTracedContactShadow: 1
+    m_UseOverride: 0
+    m_Level: 2
+  m_RayTracedContactShadow: 0
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
   m_PenumbraTint: 0
   m_NormalBias: 0.75
@@ -302,9 +302,9 @@ Light:
   m_GameObject: {fileID: 30103809}
   m_Enabled: 1
   serializedVersion: 13
-  m_Type: 0
+  m_Type: 3
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1000.0001
+  m_Intensity: 1768.3883
   m_Range: 1000
   m_SpotAngle: 130
   m_InnerSpotAngle: 63.3125
@@ -343,19 +343,19 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 2
-  m_AreaSize: {x: 1, y: 1}
+  m_AreaSize: {x: 0.45, y: 0.1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 5, w: 5.049752}
-  m_UseBoundingSphereOverride: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 1000.23047}
+  m_UseBoundingSphereOverride: 1
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
   m_ShapeRadius: 3
   m_ShadowAngle: 0
-  m_LightUnit: 2
+  m_LightUnit: 0
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
 --- !u!1 &45444048
@@ -896,7 +896,7 @@ Light:
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 10, y: 10}
+  m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
     m_Type: 1
     m_Resolution: -1
@@ -935,14 +935,14 @@ Light:
   m_LightShadowCasterMode: 2
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 6500
+  m_ColorTemperature: 6570
   m_UseColorTemperature: 1
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 10.707107}
+  m_BoundingSphereOverride: {x: 6.14e-43, y: -1.54873e-26, z: 6.11e-43, w: -74061380}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShapeRadius: 0
-  m_ShadowAngle: 0.5
+  m_ShapeRadius: 0.025
+  m_ShadowAngle: 0.1
   m_LightUnit: 2
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
@@ -955,7 +955,7 @@ Transform:
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.50274, y: 8.40506, z: -4.62684}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1039,12 +1039,12 @@ MonoBehaviour:
   m_IncludeForRayTracing: 1
   m_IncludeForPathTracing: 1
   m_AreaLightShadowCone: 120
-  m_UseScreenSpaceShadows: 1
+  m_UseScreenSpaceShadows: 0
   m_InteractsWithSky: 1
-  m_AngularDiameter: 0.5
+  m_AngularDiameter: 0.1
   diameterMultiplerMode: 0
   diameterMultiplier: 1
-  diameterOverride: 0.5
+  diameterOverride: 0.53
   celestialBodyShadingSource: 1
   sunLightOverride: {fileID: 0}
   sunColor: {r: 1, g: 1, b: 1, a: 1}
@@ -1061,7 +1061,7 @@ MonoBehaviour:
   m_Distance: 1.5e+11
   m_UseRayTracedShadows: 1
   m_NumRayTracingSamples: 4
-  m_FilterTracedShadow: 1
+  m_FilterTracedShadow: 0
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
   m_SemiTransparentShadow: 0
@@ -1096,8 +1096,8 @@ MonoBehaviour:
   m_VolumetricShadowDimmer: 1
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
-    m_Override: 1
-    m_UseOverride: 0
+    m_Override: 0
+    m_UseOverride: 1
     m_Level: 2
   m_RayTracedContactShadow: 1
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
@@ -1567,13 +1567,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1531925365}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -24.84078, y: 0.911, z: -38.7279}
+  m_LocalRotation: {x: 0.043619405, y: 0, z: 0, w: 0.9990483}
+  m_LocalPosition: {x: -24.84078, y: 0.911, z: -38.66}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 376638819}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 5, y: 0, z: 0}
 --- !u!114 &1531925367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1622,7 +1622,7 @@ MonoBehaviour:
   m_IESSpot: {fileID: 0}
   m_IncludeForRayTracing: 1
   m_IncludeForPathTracing: 1
-  m_AreaLightShadowCone: 120
+  m_AreaLightShadowCone: 10
   m_UseScreenSpaceShadows: 0
   m_InteractsWithSky: 1
   m_AngularDiameter: 0.5
@@ -1645,7 +1645,7 @@ MonoBehaviour:
   m_Distance: 1.5e+11
   m_UseRayTracedShadows: 1
   m_NumRayTracingSamples: 4
-  m_FilterTracedShadow: 1
+  m_FilterTracedShadow: 0
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
   m_SemiTransparentShadow: 0
@@ -1657,7 +1657,7 @@ MonoBehaviour:
   m_EvsmBlurPasses: 0
   m_LightlayersMask: 1
   m_LinkShadowLayers: 1
-  m_ShadowNearPlane: 0.1
+  m_ShadowNearPlane: 0
   m_BlockerSampleCount: 24
   m_FilterSampleCount: 16
   m_MinFilterSize: 0.1
@@ -1681,9 +1681,9 @@ MonoBehaviour:
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
     m_Override: 1
-    m_UseOverride: 1
-    m_Level: 0
-  m_RayTracedContactShadow: 1
+    m_UseOverride: 0
+    m_Level: 2
+  m_RayTracedContactShadow: 0
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
   m_PenumbraTint: 0
   m_NormalBias: 0.75
@@ -1724,9 +1724,9 @@ Light:
   m_GameObject: {fileID: 1531925365}
   m_Enabled: 1
   serializedVersion: 13
-  m_Type: 0
+  m_Type: 3
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1000.0001
+  m_Intensity: 1768.3883
   m_Range: 1000
   m_SpotAngle: 130
   m_InnerSpotAngle: 63.3125
@@ -1765,19 +1765,19 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 1
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 2
-  m_AreaSize: {x: 1, y: 1}
+  m_AreaSize: {x: 0.45, y: 0.1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 5, w: 5.049752}
-  m_UseBoundingSphereOverride: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 1000.23047}
+  m_UseBoundingSphereOverride: 1
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
   m_ShapeRadius: 3
   m_ShadowAngle: 0
-  m_LightUnit: 2
+  m_LightUnit: 0
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
 --- !u!1 &1610818596
@@ -6710,12 +6710,12 @@ MonoBehaviour:
   m_IncludeForRayTracing: 1
   m_IncludeForPathTracing: 1
   m_AreaLightShadowCone: 120
-  m_UseScreenSpaceShadows: 1
+  m_UseScreenSpaceShadows: 0
   m_InteractsWithSky: 1
   m_AngularDiameter: 0.5
   diameterMultiplerMode: 0
   diameterMultiplier: 1
-  diameterOverride: 3
+  diameterOverride: 0.53
   celestialBodyShadingSource: 0
   sunLightOverride: {fileID: 410087040}
   sunColor: {r: 1, g: 1, b: 1, a: 1}
@@ -6732,11 +6732,11 @@ MonoBehaviour:
   m_Distance: 384400000
   m_UseRayTracedShadows: 1
   m_NumRayTracingSamples: 4
-  m_FilterTracedShadow: 1
+  m_FilterTracedShadow: 0
   m_FilterSizeTraced: 16
   m_SunLightConeAngle: 0.5
   m_SemiTransparentShadow: 0
-  m_ColorShadow: 1
+  m_ColorShadow: 0
   m_DistanceBasedFiltering: 0
   m_EvsmExponent: 15
   m_EvsmLightLeakBias: 0
@@ -6767,10 +6767,10 @@ MonoBehaviour:
   m_VolumetricShadowDimmer: 1
   m_ShadowFadeDistance: 10000
   m_UseContactShadow:
-    m_Override: 1
-    m_UseOverride: 0
-    m_Level: 2
-  m_RayTracedContactShadow: 1
+    m_Override: 0
+    m_UseOverride: 1
+    m_Level: 0
+  m_RayTracedContactShadow: 0
   m_ShadowTint: {r: 0, g: 0, b: 0, a: 1}
   m_PenumbraTint: 0
   m_NormalBias: 0.75
@@ -6813,7 +6813,7 @@ Light:
   serializedVersion: 13
   m_Type: 1
   m_Color: {r: 0.7216981, g: 0.90573394, b: 1, a: 1}
-  m_Intensity: 2000
+  m_Intensity: 500
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -6875,8 +6875,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1628490882}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 15.4908085, y: -14.06494, z: 6.3637357}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7118,19 +7118,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afbf81a270a32904ea8240e6337886ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HDRPWeatherManager
-  dayLengthInRealSeconds: 2400
-  currentTimeOfDay: 12
+  dayLengthInRealSeconds: 1200
+  currentTimeOfDay: 8
   sunLight: {fileID: 410087040}
   moonLight: {fileID: 1628490884}
   sunBaseLux: 100000
-  moonBaseLux: 0.18
+  moonBaseLux: 1
   rainSunLux: 15000
-  daySunColor: {r: 1, g: 0.95, b: 0.8, a: 1}
-  sunsetSunColor: {r: 1, g: 0.5, b: 0.2, a: 1}
-  moonColor: {r: 0.6, g: 0.7, b: 1, a: 1}
-  rainChancePercent: 10
+  maxSunAltitude: 57
+  maxMoonAltitude: 62
+  orbitYawOffset: 90
+  daySunColor: {r: 1, g: 0.9607843, b: 0.88235295, a: 1}
+  sunsetSunColor: {r: 1, g: 0.7016972, b: 0.5424528, a: 1}
+  moonColor: {r: 0.7607843, g: 0.8392157, b: 1, a: 1}
+  rainChancePercent: 100
   weatherCheckInterval: 600
   rainDurationMinutes: 20
+  volumeTransitionSpeed: 0.5
   rainParticles: {fileID: 1610818598}
   rainAudio: {fileID: 1727512005}
   weatherVolume: {fileID: 1781564089}
@@ -7417,13 +7421,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1877198789}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06975647, y: 0, z: 0, w: 0.9975641}
-  m_LocalPosition: {x: -0.3, y: 1.21, z: -0.13}
+  m_LocalRotation: {x: 0.62932044, y: 0, z: 0, w: 0.777146}
+  m_LocalPosition: {x: 0, y: 2.45, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1990921205}
-  m_LocalEulerAnglesHint: {x: 8, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 78, y: 0, z: 0}
 --- !u!114 &1877198791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7522,7 +7526,7 @@ Camera:
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
-  m_AllowDynamicResolution: 1
+  m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
@@ -7619,7 +7623,7 @@ MonoBehaviour:
   flipYMode: 0
   xrRendering: 1
   fullscreenPassthrough: 0
-  allowDynamicResolution: 1
+  allowDynamicResolution: 0
   customRenderingSettings: 0
   invertFaceCulling: 0
   probeLayerMask:
@@ -7628,13 +7632,13 @@ MonoBehaviour:
   hasPersistentHistory: 0
   screenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
   screenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  allowDeepLearningSuperSampling: 1
+  allowDeepLearningSuperSampling: 0
   deepLearningSuperSamplingUseCustomQualitySettings: 0
   deepLearningSuperSamplingQuality: 0
   deepLearningSuperSamplingUseCustomAttributes: 0
   deepLearningSuperSamplingUseOptimalSettings: 1
   deepLearningSuperSamplingSharpening: 0
-  allowFidelityFX2SuperResolution: 1
+  allowFidelityFX2SuperResolution: 0
   fidelityFX2SuperResolutionUseCustomQualitySettings: 0
   fidelityFX2SuperResolutionQuality: 0
   fidelityFX2SuperResolutionUseCustomAttributes: 0
@@ -7999,8 +8003,8 @@ MonoBehaviour:
   centerOfMassOffset: {x: 0, y: -0.3, z: -0.1}
   angularDamping: 1.5
   dragCoefficient: 40
-  maxEngineForce: 8000
-  maxReverseForce: 4000
+  maxEngineForce: 4000
+  maxReverseForce: 2000
   forceBySpeed:
     serializedVersion: 2
     m_Curve:
@@ -8246,8 +8250,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  debugWheels: 1
-  debugLog: 1
+  debugWheels: 0
+  debugLog: 0
 --- !u!1 &2042491126 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3883992248155159444, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}

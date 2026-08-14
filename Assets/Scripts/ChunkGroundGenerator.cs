@@ -46,9 +46,8 @@ public class ChunkGroundGenerator : MonoBehaviour
     [Range(0.05f, 1f)] public float lod2Density = 0.2f;
 
     [Header("Трава: тени")]
-    [Tooltip("Отбрасывает ли трава тени вообще")]
+    [Tooltip("Отбрасывает ли трава тени (дёшево: только LOD0)")]
     public bool grassCastShadows = true;
-    [Tooltip("Максимальный LOD, который отбрасывает тень: 0 = только ближняя трава")]
     [Range(0, 2)] public int shadowMaxLOD = 0;
 
     [Header("Трава: LOD дистанции")]
@@ -696,7 +695,7 @@ public class ChunkGroundGenerator : MonoBehaviour
             Mesh mesh = streamMeshes[s];
             if (mesh == null) continue;
 
-            // Тень отбрасывает только ближний LOD (и те, что разрешил shadowMaxLOD)
+            // Тень кастует только ближний LOD (или сколько разрешил shadowMaxLOD)
             int lod = s / variantCount;
             UnityEngine.Rendering.ShadowCastingMode cast =
                 (grassCastShadows && lod <= shadowMaxLOD)
@@ -713,7 +712,7 @@ public class ChunkGroundGenerator : MonoBehaviour
                     mesh, 0, grassMaterial,
                     batchMatrices, batch, null,
                     cast,
-                    true,   // receiveShadows: трава принимает тень машины/деревьев
+                    true,   // receiveShadows: трава принимает тень машины
                     0, cachedCamera);
                 index += batch;
             }
