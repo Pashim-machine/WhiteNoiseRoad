@@ -6730,7 +6730,7 @@ MonoBehaviour:
   surfaceTexture: {fileID: 2800000, guid: cce9f0cf7e606e547a7317aedb4ad6d9, type: 3}
   surfaceTint: {r: 1, g: 1, b: 1, a: 1}
   m_Distance: 384400000
-  m_UseRayTracedShadows: 0
+  m_UseRayTracedShadows: 1
   m_NumRayTracingSamples: 4
   m_FilterTracedShadow: 1
   m_FilterSizeTraced: 16

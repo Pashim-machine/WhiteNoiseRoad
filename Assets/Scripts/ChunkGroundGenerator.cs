@@ -713,8 +713,8 @@ public class ChunkGroundGenerator : MonoBehaviour
                     mesh, 0, grassMaterial,
                     batchMatrices, batch, null,
                     cast,
-                    true,
-                    0, null); // Убрали ограничение по камере
+                    true,   // receiveShadows: трава принимает тень машины/деревьев
+                    0, cachedCamera);
                 index += batch;
             }
         }
