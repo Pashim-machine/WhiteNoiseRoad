@@ -222,7 +222,7 @@ Material:
     - _PPDPrimitiveLength: 1
     - _PPDPrimitiveWidth: 1
     - _PerPixelSorting: 0
-    - _Rain_Amount: 1
+    - _Rain_Amount: 0
     - _Rain_Flow: 2
     - _RayTracing: 0
     - _ReceivesSSR: 1
