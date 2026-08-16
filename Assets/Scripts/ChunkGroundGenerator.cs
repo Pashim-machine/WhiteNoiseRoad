@@ -28,13 +28,25 @@ public class ChunkGroundGenerator : MonoBehaviour
 
     [Header("Трава: Patch + GPU Instancing")]
     public Material grassMaterial;
-    public float grassPatchSize = 4f;
+    [Tooltip("Расстояние между центрами ячеек сетки (высокая частота = густая трава)")]
+    public float grassCellSize = 2f;
+    [Tooltip("Реальный размер mesh патча (должен быть меньше cellSize чтобы не было перекрытия)")]
+    public float grassPatchFootprint = 1.2f;
     [Range(1, 4)] public int grassMeshVariants = 2;
-    [Range(8, 96)] public int bladesLOD0 = 48;   // crossed quads
-    [Range(4, 48)] public int bladesLOD1 = 16;   // single quads
+    [Range(8, 96)] public int bladesLOD0 = 48;
+    [Range(4, 48)] public int bladesLOD1 = 16;
+
+    [Tooltip("Высота травы в метрах (реалистично 0.15–0.4)")]
+    public float grassHeight = 0.25f;
     public float grassMinScale = 0.7f;
     public float grassMaxScale = 1.2f;
     public float grassWidth = 0.35f;
+
+    [Header("Трава: Perlin смещение")]
+    [Tooltip("Масштаб Perlin-шума для разбивки регулярной сетки")]
+    public float perlinScale = 0.15f;
+    [Tooltip("Сила Perlin-смещения в метрах (рекомендуется 0.3-0.8 от cellSize)")]
+    public float perlinStrength = 1.0f;
 
     [Header("Трава: густота и зоны")]
     [Range(0.1f, 1f)] public float grassDensity = 0.9f;
@@ -105,7 +117,7 @@ public class ChunkGroundGenerator : MonoBehaviour
         public float rotC;
         public float rotS;
         public float scale;
-        public float rand01;   // детерминированное прореживание LOD
+        public float rand01;
         public byte variant;
         public bool alive;
     }
@@ -134,7 +146,7 @@ public class ChunkGroundGenerator : MonoBehaviour
         perlinOffsetX = transform.position.x * 0.13f + 1000f;
         perlinOffsetZ = transform.position.z * 0.17f + 1000f;
 
-        float rt = Mathf.Max(1f, grassPatchSize * 0.5f);
+        float rt = Mathf.Max(1f, grassCellSize * 0.5f);
         rebuildThresholdSqr = rt * rt;
         lastRebuildPosition = Vector3.zero;
         if (cachedCamera != null) lastCameraRot = cachedCamera.transform.rotation;
@@ -444,7 +456,7 @@ public class ChunkGroundGenerator : MonoBehaviour
             streamMeshes[2 * variantCount + v] = BuildPatchMeshLOD2(v);
         }
 
-        patchCullRadius = grassPatchSize * 0.75f + grassMaxScale;
+        patchCullRadius = grassPatchFootprint * 0.75f + grassMaxScale;
     }
 
     private Mesh BuildPatchMeshLOD0(int variant)
@@ -454,16 +466,13 @@ public class ChunkGroundGenerator : MonoBehaviour
         Vector2[] uvs = new Vector2[blades * 8];
         int[] tris = new int[blades * 12];
         float halfWidth = grassWidth * 0.5f;
-        float patchRadius = grassPatchSize * 0.5f;
+        float half = grassPatchFootprint * 0.5f;   // квадрат, а не круг
 
         for (int i = 0; i < blades; i++)
         {
-            float angle = i * 2.399963f + Hash01(i, variant, 101) * 1.2f;
-            float radius = Mathf.Sqrt((i + 0.5f) / blades) * patchRadius;
-            float px = Mathf.Cos(angle) * radius;
-            float pz = Mathf.Sin(angle) * radius;
+            SquarePosition(i, blades, variant, half, out float px, out float pz);
             float yaw = Hash01(i, variant, 102) * Mathf.PI * 2f;
-            float height = 0.85f + 0.35f * Hash01(i, variant, 103);
+            float height = grassHeight * (0.75f + 0.5f * Hash01(i, variant, 103));
             WriteCrossedBlade(verts, uvs, tris, i * 8, i * 12, px, pz, yaw, halfWidth, height);
         }
         return CreateMesh("GrassPatch_LOD0_V" + variant, verts, uvs, tris);
@@ -475,17 +484,14 @@ public class ChunkGroundGenerator : MonoBehaviour
         Vector3[] verts = new Vector3[blades * 4];
         Vector2[] uvs = new Vector2[blades * 4];
         int[] tris = new int[blades * 6];
-        float halfWidth = grassWidth * 0.6f; // чуть шире: одна плоскость вместо двух
-        float patchRadius = grassPatchSize * 0.5f;
+        float halfWidth = grassWidth * 0.6f;
+        float half = grassPatchFootprint * 0.5f;
 
         for (int i = 0; i < blades; i++)
         {
-            float angle = i * 2.399963f + Hash01(i, variant, 201) * 1.2f;
-            float radius = Mathf.Sqrt((i + 0.5f) / blades) * patchRadius;
-            float px = Mathf.Cos(angle) * radius;
-            float pz = Mathf.Sin(angle) * radius;
+            SquarePosition(i, blades, variant, half, out float px, out float pz);
             float yaw = Hash01(i, variant, 202) * Mathf.PI * 2f;
-            float height = 0.85f + 0.35f * Hash01(i, variant, 203);
+            float height = grassHeight * (0.75f + 0.5f * Hash01(i, variant, 203));
 
             float c = Mathf.Cos(yaw), s = Mathf.Sin(yaw);
             Vector3 off = new Vector3(px, 0f, pz);
@@ -498,13 +504,12 @@ public class ChunkGroundGenerator : MonoBehaviour
 
     private Mesh BuildPatchMeshLOD2(int variant)
     {
-        // Tuft: 2 crossed quads, ширина x2.2 — дешёвый силуэт густой травы
         Vector3[] verts = new Vector3[8];
         Vector2[] uvs = new Vector2[8];
         int[] tris = new int[12];
         float halfWidth = grassWidth * 1.1f;
         float yaw = 0.4f + variant * 0.7f;
-        WriteCrossedBlade(verts, uvs, tris, 0, 0, 0f, 0f, yaw, halfWidth, 0.9f);
+        WriteCrossedBlade(verts, uvs, tris, 0, 0, 0f, 0f, yaw, halfWidth, grassHeight * 1.2f);
         return CreateMesh("GrassPatch_LOD2_V" + variant, verts, uvs, tris);
     }
 
@@ -547,22 +552,45 @@ public class ChunkGroundGenerator : MonoBehaviour
     private void GenerateGrassPatches()
     {
         if (grassMaterial == null) { patches = null; return; }
-        if (grassPatchSize <= 0.1f) grassPatchSize = 4f;
+        if (grassCellSize <= 0.1f) grassCellSize = 2f;
 
-        patchGridX = Mathf.Max(1, Mathf.FloorToInt(width / grassPatchSize));
-        patchGridZ = Mathf.Max(1, Mathf.FloorToInt(length / grassPatchSize));
+        patchGridX = Mathf.Max(1, Mathf.FloorToInt(width / grassCellSize));
+        patchGridZ = Mathf.Max(1, Mathf.FloorToInt(length / grassCellSize));
         patches = new GrassPatch[patchGridX * patchGridZ];
 
         for (int pz = 0; pz < patchGridZ; pz++)
         {
             for (int px = 0; px < patchGridX; px++)
             {
-                float x = terrainStartX + (px + 0.5f) * grassPatchSize;
-                float z = terrainStartZ + (pz + 0.5f) * grassPatchSize;
+                int patchIndex = pz * patchGridX + px;
+                GrassPatch p = new GrassPatch();
+                p.alive = false;
 
-                float dist = distanceField.SampleDistanceLocal(x, z);
-                if (dist < grassRoadMargin) continue;
+                // Центр ячейки в логической сетке
+                float cellCenterX = terrainStartX + (px + 0.5f) * grassCellSize;
+                float cellCenterZ = terrainStartZ + (pz + 0.5f) * grassCellSize;
 
+                // Perlin = крупные «острова» густоты (гладкий, соседние ячейки correlated)
+                float noiseX = Mathf.PerlinNoise(cellCenterX * perlinScale, cellCenterZ * perlinScale) * 2f - 1f;
+                float noiseZ = Mathf.PerlinNoise(cellCenterZ * perlinScale + 100f, cellCenterX * perlinScale + 100f) * 2f - 1f;
+
+                // Белый шум = независимый джиттер каждой ячейки (ломает полосы/ряды)
+                float whiteX = (Hash01(px, pz, 131) - 0.5f) * 2f;
+                float whiteZ = (Hash01(px, pz, 137) - 0.5f) * 2f;
+                float jitter = grassCellSize * 0.35f;
+
+                float finalX = cellCenterX + noiseX * perlinStrength + whiteX * jitter;
+                float finalZ = cellCenterZ + noiseZ * perlinStrength + whiteZ * jitter;
+
+                // Проверяем расстояние до дороги
+                float dist = distanceField.SampleDistanceLocal(finalX, finalZ);
+                if (dist < grassRoadMargin)
+                {
+                    patches[patchIndex] = p;
+                    continue;
+                }
+
+                // Вычисляем плотность для этой точки
                 float density;
                 if (dist < grassRoadMargin + grassTransitionZone)
                 {
@@ -571,11 +599,17 @@ public class ChunkGroundGenerator : MonoBehaviour
                 }
                 else density = grassDensity;
 
-                if (Hash01(px, pz, 11) > density) continue;
+                // Детерминированная проверка плотности
+                if (Hash01(px, pz, 11) > density)
+                {
+                    patches[patchIndex] = p;
+                    continue;
+                }
 
-                GrassPatch p = new GrassPatch();
-                float terrainY = SampleTerrainHeight(x, z);
-                p.worldPos = transform.TransformPoint(new Vector3(x, terrainY, z));
+                // Сэмплим высоту в финальной точке
+                float terrainY = SampleTerrainHeight(finalX, finalZ);
+                p.worldPos = transform.TransformPoint(new Vector3(finalX, terrainY, finalZ));
+
                 float yaw = Hash01(px, pz, 23) * Mathf.PI * 2f;
                 p.rotC = Mathf.Cos(yaw);
                 p.rotS = Mathf.Sin(yaw);
@@ -583,7 +617,8 @@ public class ChunkGroundGenerator : MonoBehaviour
                 p.rand01 = Hash01(px, pz, 53);
                 p.variant = (byte)Mathf.Min(variantCount - 1, (int)(Hash01(px, pz, 71) * variantCount));
                 p.alive = true;
-                patches[pz * patchGridX + px] = p;
+
+                patches[patchIndex] = p;
             }
         }
         grassDirty = true;
@@ -598,6 +633,28 @@ public class ChunkGroundGenerator : MonoBehaviour
             h ^= h >> 16;
             return (float)(h / 4294967295.0);
         }
+    }
+
+    /// Детерминированное стратифицированное распределение по КВАДРАТУ [-half..half]².
+    /// Каждая травинка получает свою страту (ячейку сетки) + jitter внутри неё —
+    /// нет ни кластеров, ни пустых углов, при любом blades от 4 до 96.
+    private static void SquarePosition(int i, int blades, int variant, float half, out float px, out float pz)
+    {
+        int cols = Mathf.Max(1, Mathf.CeilToInt(Mathf.Sqrt(blades)));
+        int rows = Mathf.Max(1, Mathf.CeilToInt(blades / (float)cols));
+
+        int col = i % cols;
+        int row = i / cols;
+
+        float cellW = (half * 2f) / cols;
+        float cellH = (half * 2f) / rows;
+
+        // детерминированный jitter внутри страты (новые salt'ы, не пересекаются с остальными)
+        float jx = Hash01(i, variant, 104);
+        float jz = Hash01(i, variant, 105);
+
+        px = -half + (col + jx) * cellW;
+        pz = -half + (row + jz) * cellH;
     }
 
     // ================= GRASS: REBUILD (единственное место, где считаются матрицы) =================
@@ -622,18 +679,19 @@ public class ChunkGroundGenerator : MonoBehaviour
         float renderSqr = grassRenderDistance * grassRenderDistance;
 
         Vector3 localCenter = transform.InverseTransformPoint(cullCenter);
-        float search = grassRenderDistance + grassPatchSize;
-        int minPx = Mathf.Clamp(Mathf.FloorToInt((localCenter.x - search - terrainStartX) / grassPatchSize), 0, patchGridX - 1);
-        int maxPx = Mathf.Clamp(Mathf.CeilToInt((localCenter.x + search - terrainStartX) / grassPatchSize), 0, patchGridX - 1);
-        int minPz = Mathf.Clamp(Mathf.FloorToInt((localCenter.z - search - terrainStartZ) / grassPatchSize), 0, patchGridZ - 1);
-        int maxPz = Mathf.Clamp(Mathf.CeilToInt((localCenter.z + search - terrainStartZ) / grassPatchSize), 0, patchGridZ - 1);
+        float search = grassRenderDistance + grassCellSize;
+        int minPx = Mathf.Clamp(Mathf.FloorToInt((localCenter.x - search - terrainStartX) / grassCellSize), 0, patchGridX - 1);
+        int maxPx = Mathf.Clamp(Mathf.CeilToInt((localCenter.x + search - terrainStartX) / grassCellSize), 0, patchGridX - 1);
+        int minPz = Mathf.Clamp(Mathf.FloorToInt((localCenter.z - search - terrainStartZ) / grassCellSize), 0, patchGridZ - 1);
+        int maxPz = Mathf.Clamp(Mathf.CeilToInt((localCenter.z + search - terrainStartZ) / grassCellSize), 0, patchGridZ - 1);
 
         for (int pz = minPz; pz <= maxPz; pz++)
         {
             int rowBase = pz * patchGridX;
             for (int px = minPx; px <= maxPx; px++)
             {
-                GrassPatch p = patches[rowBase + px];
+                int patchIndex = rowBase + px;
+                GrassPatch p = patches[patchIndex];
                 if (!p.alive) continue;
 
                 float dx = p.worldPos.x - cullCenter.x;
@@ -648,10 +706,8 @@ public class ChunkGroundGenerator : MonoBehaviour
                 else if (distSqr <= lod2Sqr) { lod = 2; density = lod2Density; }
                 else continue;
 
-                // LOD прореживает КОЛИЧЕСТВО инстансов, а не только полигонаж
                 if (density < 1f && p.rand01 > density) continue;
 
-                // Frustum culling на уровне patch (sphere vs 6 planes)
                 if (!PatchInFrustum(p.worldPos, patchCullRadius)) continue;
 
                 int stream = lod * variantCount + p.variant;

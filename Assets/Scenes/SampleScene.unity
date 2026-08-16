@@ -1824,7 +1824,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 18faab52b781ec446b9eb51d82587c1b, type: 2}
+  - {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6813,7 +6813,7 @@ Light:
   serializedVersion: 13
   m_Type: 1
   m_Color: {r: 0.7216981, g: 0.90573394, b: 1, a: 1}
-  m_Intensity: 500
+  m_Intensity: 300
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -7129,9 +7129,9 @@ MonoBehaviour:
   maxMoonAltitude: 62
   orbitYawOffset: 90
   daySunColor: {r: 1, g: 0.9607843, b: 0.88235295, a: 1}
-  sunsetSunColor: {r: 1, g: 0.7016972, b: 0.5424528, a: 1}
+  sunsetSunColor: {r: 1, g: 0.8008386, b: 0.6933962, a: 1}
   moonColor: {r: 0.7607843, g: 0.8392157, b: 1, a: 1}
-  rainChancePercent: 100
+  rainChancePercent: 5
   weatherCheckInterval: 600
   rainDurationMinutes: 20
   volumeTransitionSpeed: 0.5
@@ -7140,8 +7140,9 @@ MonoBehaviour:
   weatherVolume: {fileID: 1781564089}
   clearProfile: {fileID: 11400000, guid: d2f51baaa95ddca4bbaf6081439236c6, type: 2}
   rainProfile: {fileID: 11400000, guid: 192c41327de1267489a6cd32b0ffc571, type: 2}
-  windshieldMaterial: {fileID: 2100000, guid: 18faab52b781ec446b9eb51d82587c1b, type: 2}
+  windshieldMaterial: {fileID: 2100000, guid: 4d07a417883ccb54080eef96df8a6722, type: 2}
   rainFadeSpeed: 0.5
+  carPhysics: {fileID: 1990921207}
 --- !u!1 &1781564088
 GameObject:
   m_ObjectHideFlags: 0
@@ -7382,7 +7383,7 @@ Animator:
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 9060c3b70264ca443bf83cdfcec7be52, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 1
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
@@ -7421,13 +7422,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1877198789}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.62932044, y: 0, z: 0, w: 0.777146}
-  m_LocalPosition: {x: 0, y: 2.45, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.37, y: 1.21, z: -0.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1990921205}
-  m_LocalEulerAnglesHint: {x: 78, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1877198791
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7703,6 +7704,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1469678075}
     m_Modifications:
+    - target: {fileID: 618829518443456171, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 618829518443456171, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 51a7642d537c1154283e6adfe4974a9c, type: 2}
+    - target: {fileID: 618829518443456171, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 43fa4972c25fbb741add3c6178912e57, type: 2}
+    - target: {fileID: 618829518443456171, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4d07a417883ccb54080eef96df8a6722, type: 2}
     - target: {fileID: 1458411636475625548, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -7879,6 +7896,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6658456595027448114, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: m_CastShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6658456595027448114, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: m_StaticShadowCaster
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6658456595027448114, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6658456595027448114, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: 'm_Materials.Array.data[6]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4d07a417883ccb54080eef96df8a6722, type: 2}
+    - target: {fileID: 6658456595027448114, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+      propertyPath: 'm_Materials.Array.data[7]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 18faab52b781ec446b9eb51d82587c1b, type: 2}
     - target: {fileID: 7661218176189703381, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -7907,6 +7944,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3362294673065200741, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
   m_PrefabInstance: {fileID: 1886983317}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &1899263287 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6658456595027448114, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}
+  m_PrefabInstance: {fileID: 1886983317}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1990921202
 GameObject:
   m_ObjectHideFlags: 0
@@ -7919,6 +7961,7 @@ GameObject:
   - component: {fileID: 1990921204}
   - component: {fileID: 1990921203}
   - component: {fileID: 1990921207}
+  - component: {fileID: 1990921208}
   m_Layer: 8
   m_Name: CarRoot
   m_TagString: Untagged
@@ -7981,10 +8024,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1469678075}
-  - {fileID: 1610818599}
   - {fileID: 376638819}
   - {fileID: 1863565253}
   - {fileID: 1877198790}
+  - {fileID: 1610818599}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1990921207
@@ -8252,6 +8295,24 @@ MonoBehaviour:
     m_Bits: 4294967295
   debugWheels: 0
   debugLog: 0
+--- !u!114 &1990921208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990921202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64387787f37ea6c4fa11a0d04fbde7ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RainFlowController
+  car: {fileID: 1990921207}
+  bodyRenderer: {fileID: 1899263287}
+  glassMaterialIndex: 6
+  gravityFlow: 0.4
+  windFlow: 0.08
+  maxFlow: 3
 --- !u!1 &2042491126 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3883992248155159444, guid: 1ea7f0de0e104d14c8a8e4a99986b332, type: 3}

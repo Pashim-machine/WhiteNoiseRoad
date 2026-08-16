@@ -49,6 +49,8 @@ public class HDRPWeatherManager : MonoBehaviour
     private float weatherTimer = 0f;
     private float rainTimer = 0f;
     private float currentVolumeBlend = 0f;
+    public CarPhysics carPhysics;   // перетащи CarRoot (компонент CarPhysics)
+    private float currentFlow = 1f;
 
     void Start()
     {
@@ -180,6 +182,12 @@ public class HDRPWeatherManager : MonoBehaviour
         float targetRainAmount = isRaining ? 1f : 0f;
         currentWindshieldRain = Mathf.MoveTowards(currentWindshieldRain, targetRainAmount, rainFadeSpeed * Time.deltaTime);
         windshieldMaterial.SetFloat("_Rain_Amount", currentWindshieldRain);
+
+        float speed = carPhysics != null ? carPhysics.GetVelocity().magnitude : 0f;
+
+        // скорость 0 -> flow = +1 (стекают вниз), скорость 100 -> flow = -1 (разбрызгиваются)
+        currentFlow = Mathf.Lerp(1f, -1f, Mathf.InverseLerp(0f, 100f, speed));
+        windshieldMaterial.SetFloat("_Flow", currentFlow);
     }
 
     void CheckWeatherProbability()

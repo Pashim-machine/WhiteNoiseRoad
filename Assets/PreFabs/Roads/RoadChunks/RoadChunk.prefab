@@ -130,7 +130,7 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 1
+  m_RayTracingMode: 2
   m_RayTraceProcedural: 0
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
@@ -192,36 +192,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ChunkGroundGenerator
   resolution: 128
   collisionResolution: 64
-  heightScale: 5
+  heightScale: 3
   noiseScale: 0.02
   autoRoadHeight: 1
   roadHeightOffset: 0
-  roadTuck: 0.03
+  roadTuck: 0.01
   flatZoneRadius: 8
   blendZone: 15
   edgeBlendZone: 20
   terrainPadding: 40
   grassMaterial: {fileID: 2100000, guid: 5ef5cceff1dc8e449991bbadc78a8ca2, type: 2}
-  grassPatchSize: 1
-  grassMeshVariants: 4
-  bladesLOD0: 96
-  bladesLOD1: 25
-  grassMinScale: 0.8
+  grassCellSize: 1.5
+  grassPatchFootprint: 3
+  grassMeshVariants: 2
+  bladesLOD0: 64
+  bladesLOD1: 20
+  grassHeight: 0.5
+  grassMinScale: 0.7
   grassMaxScale: 1.2
-  grassWidth: 0.8
-  grassDensity: 0.9
+  grassWidth: 0.18
+  perlinScale: 0.3
+  perlinStrength: 0.25
+  grassDensity: 1
   grassRoadMargin: 2.5
   grassTransitionZone: 8
   grassNearRoadDensity: 0.2
   lod0Density: 1
-  lod1Density: 0.9
-  lod2Density: 0.6
+  lod1Density: 0.4
+  lod2Density: 0.2
   grassCastShadows: 1
   shadowMaxLOD: 0
-  grassLOD0Distance: 50
-  grassLOD1Distance: 100
-  grassLOD2Distance: 150
-  grassRenderDistance: 300
+  grassLOD0Distance: 20
+  grassLOD1Distance: 55
+  grassLOD2Distance: 100
+  grassRenderDistance: 110
   maxGrassUpdateInterval: 2
   environmentGridStep: 12
   environmentPrefabs: []
