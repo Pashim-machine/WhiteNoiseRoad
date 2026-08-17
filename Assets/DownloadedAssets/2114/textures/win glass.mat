@@ -26,10 +26,9 @@ Material:
     RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
-  - TransparentDepthPrepass
-  - TransparentBackface
   - RayTracingPrepass
   - TransparentDepthPostpass
+  - TransparentBackface
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -243,7 +242,7 @@ Material:
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0
-    - _TransparentDepthPrepassEnable: 0
+    - _TransparentDepthPrepassEnable: 1
     - _TransparentSortPriority: 0
     - _TransparentWritingMotionVec: 0
     - _TransparentZWrite: 0
